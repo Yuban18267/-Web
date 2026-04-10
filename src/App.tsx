@@ -157,7 +157,7 @@ export default function App() {
       <footer id="contact" className="py-12 px-6 bg-white border-t border-gray-200 text-center">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold mb-2">拾壹屿</h2>
-          <p className="text-gray-600 italic mb-8">"永远相信美好的事情即将发生！"</p>
+          <p className="text-gray-600 italic mb-8">永远相信美好的事情即将发生！</p>
           <div className="flex justify-center gap-6 mb-8">
             <SocialLink icon={<Twitter size={20} />} href="#" />
             <SocialLink icon={<Github size={20} />} href="#" />
