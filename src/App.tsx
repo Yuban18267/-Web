@@ -5,6 +5,9 @@ import { Github, Twitter, Mail, ChevronRight, ChevronLeft, Camera, Video, BookOp
 export default function App() {
   const [currentImage, setCurrentImage] = useState(0);
   const images = [
+    // 💡 提示：由于刚才图片上传失败，我在这里留下了占位图。
+    // 当你把代码下载到本地后，你可以把图片放到 public 文件夹下，
+    // 然后把这里的链接改成 "/你的图片名字.jpg" 就可以了！
     "https://picsum.photos/seed/landscape1/1200/600",
     "https://picsum.photos/seed/landscape2/1200/600",
     "https://picsum.photos/seed/landscape3/1200/600",
@@ -20,10 +23,11 @@ export default function App() {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <span className="font-bold text-xl tracking-tight">拾壹屿</span>
-          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-600 items-center">
             <a href="#photography" className="hover:text-blue-600 transition-colors">摄影</a>
             <a href="#video" className="hover:text-blue-600 transition-colors">视频</a>
             <a href="#blog" className="hover:text-blue-600 transition-colors">博客</a>
+            <a href="#contact" className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm">联系我</a>
           </div>
         </div>
       </nav>
@@ -150,9 +154,10 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-white border-t border-gray-200 text-center">
+      <footer id="contact" className="py-12 px-6 bg-white border-t border-gray-200 text-center">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6">拾壹屿</h2>
+          <h2 className="text-2xl font-bold mb-2">拾壹屿</h2>
+          <p className="text-gray-600 italic mb-8">"永远相信美好的事情即将发生！"</p>
           <div className="flex justify-center gap-6 mb-8">
             <SocialLink icon={<Twitter size={20} />} href="#" />
             <SocialLink icon={<Github size={20} />} href="#" />
