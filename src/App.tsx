@@ -17,6 +17,22 @@ export default function App() {
   const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length);
   const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
 
+  // Reusable animation variants for scroll reveal
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans selection:bg-blue-200">
       {/* Navigation */}
@@ -33,12 +49,12 @@ export default function App() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="pt-32 pb-16 px-6 min-h-[80vh] flex items-center">
+        <div className="max-w-5xl mx-auto text-center w-full">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
             className="max-w-3xl mx-auto"
           >
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
@@ -52,8 +68,14 @@ export default function App() {
       </section>
 
       {/* Photography Carousel Section */}
-      <section id="photography" className="py-16 bg-white px-6">
-        <div className="max-w-5xl mx-auto">
+      <section id="photography" className="py-24 bg-white px-6">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInUp}
+          className="max-w-5xl mx-auto"
+        >
           <div className="flex items-center gap-3 mb-8">
             <Camera className="text-blue-600" size={28} />
             <h2 className="text-3xl font-bold">摄影作品</h2>
@@ -63,9 +85,9 @@ export default function App() {
           <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[16/9] md:aspect-[21/9] group shadow-sm border border-gray-100">
             <motion.img
               key={currentImage}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               src={images[currentImage]}
               alt={`Photography ${currentImage + 1}`}
               className="w-full h-full object-cover"
@@ -73,101 +95,120 @@ export default function App() {
             />
             
             {/* Carousel Controls */}
-            <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <button 
                 onClick={prevImage}
-                className="w-10 h-10 rounded-full bg-white/80 backdrop-blur text-gray-900 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                className="w-12 h-12 rounded-full bg-white/80 backdrop-blur text-gray-900 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={28} />
               </button>
               <button 
                 onClick={nextImage}
-                className="w-10 h-10 rounded-full bg-white/80 backdrop-blur text-gray-900 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                className="w-12 h-12 rounded-full bg-white/80 backdrop-blur text-gray-900 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={28} />
               </button>
             </div>
             
             {/* Indicators */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3">
               {images.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentImage(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${idx === currentImage ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/80'}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${idx === currentImage ? 'bg-white w-8' : 'bg-white/50 w-2 hover:bg-white/80'}`}
                 />
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Video & Blog Section */}
-      <section className="py-16 bg-gray-50 px-6">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
+      <section className="py-24 bg-gray-50 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
           
           {/* Video Section */}
-          <div id="video">
-            <div className="flex items-center gap-3 mb-6">
+          <motion.div 
+            id="video"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-8">
               <Video className="text-blue-600" size={24} />
               <h2 className="text-2xl font-bold">视频记录</h2>
-            </div>
-            <div className="space-y-6">
+            </motion.div>
+            <div className="space-y-8">
               {[1, 2].map((item) => (
-                <div key={item} className="group cursor-pointer">
-                  <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden relative mb-3">
-                    <img src={`https://picsum.photos/seed/video${item}/600/400`} alt="Video thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                        <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-blue-600 border-b-[8px] border-b-transparent ml-1"></div>
+                <motion.div key={item} variants={fadeInUp} className="group cursor-pointer">
+                  <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden relative mb-4 shadow-sm">
+                    <img src={`https://picsum.photos/seed/video${item}/600/400`} alt="Video thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-transparent transition-colors duration-500">
+                      <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-blue-600 border-b-[8px] border-b-transparent ml-1"></div>
                       </div>
                     </div>
                   </div>
-                  <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors">旅行 Vlog：山川与湖海的故事</h3>
-                  <p className="text-gray-500 text-sm">2026年4月 • 5:24</p>
-                </div>
+                  <h3 className="font-bold text-xl group-hover:text-blue-600 transition-colors">旅行 Vlog：山川与湖海的故事</h3>
+                  <p className="text-gray-500 text-sm mt-2">2026年4月 • 5:24</p>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Blog Section */}
-          <div id="blog">
-            <div className="flex items-center gap-3 mb-6">
+          <motion.div 
+            id="blog"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-8">
               <BookOpen className="text-blue-600" size={24} />
               <h2 className="text-2xl font-bold">文字博客</h2>
-            </div>
+            </motion.div>
             <div className="space-y-6">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="p-6 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group">
-                  <p className="text-sm text-blue-600 font-medium mb-2">随笔</p>
-                  <h3 className="font-bold text-xl mb-2 group-hover:text-blue-600 transition-colors">在喧嚣中寻找内心的平静</h3>
-                  <p className="text-gray-600 line-clamp-2 mb-4">
+                <motion.div key={item} variants={fadeInUp} className="p-8 bg-white rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
+                  <p className="text-sm text-blue-600 font-semibold tracking-wide mb-3 uppercase">随笔</p>
+                  <h3 className="font-bold text-2xl mb-3 group-hover:text-blue-600 transition-colors">在喧嚣中寻找内心的平静</h3>
+                  <p className="text-gray-600 line-clamp-2 mb-6 leading-relaxed">
                     摄影不仅仅是按下快门的那一瞬间，更是观察世界的一种方式。当我们放慢脚步，去注意那些平时被忽略的细节时...
                   </p>
-                  <span className="text-sm text-gray-400">2026年4月9日</span>
-                </div>
+                  <span className="text-sm text-gray-400 font-medium">2026年4月9日</span>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="py-12 px-6 bg-white border-t border-gray-200 text-center">
+      <motion.footer 
+        id="contact"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInUp}
+        className="py-16 px-6 bg-white border-t border-gray-200 text-center"
+      >
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-2">拾壹屿</h2>
-          <p className="text-gray-600 italic mb-8">永远相信美好的事情即将发生！</p>
-          <div className="flex justify-center gap-6 mb-8">
-            <SocialLink icon={<Twitter size={20} />} href="#" />
-            <SocialLink icon={<Github size={20} />} href="#" />
-            <SocialLink icon={<Mail size={20} />} href="#" />
+          <h2 className="text-3xl font-bold mb-3">拾壹屿</h2>
+          <p className="text-gray-500 italic mb-10 text-lg">永远相信美好的事情即将发生！</p>
+          <div className="flex justify-center gap-6 mb-10">
+            <SocialLink icon={<Twitter size={22} />} href="#" />
+            <SocialLink icon={<Github size={22} />} href="#" />
+            <SocialLink icon={<Mail size={22} />} href="#" />
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-400 text-sm font-medium">
             © {new Date().getFullYear()} 拾壹屿. All rights reserved.
           </p>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
@@ -176,7 +217,7 @@ function SocialLink({ icon, href }: { icon: React.ReactNode, href: string }) {
   return (
     <a 
       href={href}
-      className="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+      className="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 hover:scale-110 transition-all duration-300"
     >
       {icon}
     </a>
