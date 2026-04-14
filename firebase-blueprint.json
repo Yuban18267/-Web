@@ -35,6 +35,18 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "content", "createdAt"]
+    },
+    "Game": {
+      "title": "Game",
+      "description": "A game life post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the game entry" },
+        "content": { "type": "string", "description": "Description or thoughts" },
+        "url": { "type": "string", "description": "Image URL" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "url", "createdAt"]
     }
   },
   "firestore": {
@@ -49,6 +61,10 @@
     "/blogs/{blogId}": {
       "schema": "Blog",
       "description": "Collection of blog posts"
+    },
+    "/games/{gameId}": {
+      "schema": "Game",
+      "description": "Collection of game life posts"
     }
   }
 }

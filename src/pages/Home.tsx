@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Camera, Video, BookOpen, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,18 @@ export default function Home() {
   const [videos, setVideos] = useState<any[]>([]);
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayText, setDisplayText] = useState('');
+  const fullText = '拾壹屿';
+
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      setDisplayText(fullText.slice(0, i));
+      i++;
+      if (i > fullText.length) clearInterval(timer);
+    }, 200);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,10 +80,10 @@ export default function Home() {
             variants={fadeInUp}
             className="max-w-3xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-zinc-100 mb-6 leading-tight">
-              你好，我是<span className="text-zinc-400">拾壹屿</span>
+            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight text-zinc-100 mb-8 leading-tight min-h-[1.2em]">
+              你好，我是<span className="text-zinc-400 inline-block min-w-[3em]">{displayText}<span className="animate-pulse">|</span></span>
             </h1>
-            <p className="text-xl text-zinc-400 mb-10 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-zinc-500 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
               用镜头捕捉光影，用文字记录生活。这里是我的个人空间，分享我的摄影作品、视频记录和日常随笔。
             </p>
           </motion.div>

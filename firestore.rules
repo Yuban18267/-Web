@@ -14,5 +14,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+    match /games/{gameId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

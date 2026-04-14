@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Lock, Upload, Plus, Trash2, LogOut, Image as ImageIcon, Video, FileText } from 'lucide-react';
+import { Lock, Upload, Plus, Trash2, LogOut, Image as ImageIcon, Video, FileText, Gamepad2 } from 'lucide-react';
 import { db, storage } from '../lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -8,7 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 export default function Admin() {
   const [password, setPassword] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'blogs'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'blogs' | 'games'>('photos');
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
 
@@ -91,6 +91,9 @@ export default function Admin() {
       } else if (activeTab === 'blogs') {
         data.content = content;
         data.category = category;
+      } else if (activeTab === 'games') {
+        data.url = finalUrl;
+        data.content = content;
       }
 
       await addDoc(collection(db, activeTab), data);
@@ -174,6 +177,7 @@ export default function Admin() {
           <TabButton active={activeTab === 'photos'} onClick={() => setActiveTab('photos')} icon={<ImageIcon size={18} />} label="摄影作品" />
           <TabButton active={activeTab === 'videos'} onClick={() => setActiveTab('videos')} icon={<Video size={18} />} label="视频记录" />
           <TabButton active={activeTab === 'blogs'} onClick={() => setActiveTab('blogs')} icon={<FileText size={18} />} label="文字博客" />
+          <TabButton active={activeTab === 'games'} onClick={() => setActiveTab('games')} icon={<Gamepad2 size={18} />} label="游戏生涯" />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-10">
@@ -263,6 +267,19 @@ export default function Admin() {
                       />
                     </div>
                   </>
+                )}
+
+                {activeTab === 'games' && (
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">心得/描述</label>
+                    <textarea 
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500 min-h-[150px]"
+                      placeholder="记录你的游戏瞬间..."
+                      required
+                    />
+                  </div>
                 )}
 
                 <button 
