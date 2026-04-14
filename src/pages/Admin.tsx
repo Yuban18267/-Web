@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Lock, Upload, Plus, Trash2, LogOut, Image as ImageIcon, Video, FileText, Gamepad2 } from 'lucide-react';
+import { Lock, Upload, Plus, Trash2, LogOut, Image as ImageIcon, Video, FileText, Gamepad2, Phone } from 'lucide-react';
 import { db, storage } from '../lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function Admin() {
   const [password, setPassword] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'blogs' | 'games'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'blogs' | 'games' | 'contacts'>('photos');
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
 
@@ -19,6 +19,15 @@ export default function Admin() {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('随笔');
   const [file, setFile] = useState<File | null>(null);
+
+  // Contact form states
+  const [contactInfo, setContactInfo] = useState({
+    twitter: '',
+    github: '',
+    email: '',
+    qq: '',
+    wechat: ''
+  });
 
   const ADMIN_PASSWORD = 'yuban18267';
 
@@ -36,9 +45,17 @@ export default function Admin() {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, activeTab), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      if (activeTab === 'contacts') {
+        const docRef = doc(db, 'contacts', 'main');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setContactInfo(docSnap.data() as any);
+        }
+      } else {
+        const q = query(collection(db, activeTab), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }
     } catch (error) {
       console.error("Error fetching items:", error);
     }
@@ -71,39 +88,44 @@ export default function Admin() {
     e.preventDefault();
     setLoading(true);
     try {
-      let finalUrl = url;
-      if (file) {
-        const uploadedUrl = await handleFileUpload();
-        if (uploadedUrl) finalUrl = uploadedUrl;
+      if (activeTab === 'contacts') {
+        await setDoc(doc(db, 'contacts', 'main'), contactInfo);
+        alert('联系方式保存成功！');
+      } else {
+        let finalUrl = url;
+        if (file) {
+          const uploadedUrl = await handleFileUpload();
+          if (uploadedUrl) finalUrl = uploadedUrl;
+        }
+
+        const data: any = {
+          title,
+          createdAt: new Date().toISOString(),
+        };
+
+        if (activeTab === 'photos') {
+          data.url = finalUrl;
+        } else if (activeTab === 'videos') {
+          data.url = finalUrl; // thumbnail
+          data.videoUrl = videoUrl;
+          data.duration = "5:00"; // Default
+        } else if (activeTab === 'blogs') {
+          data.content = content;
+          data.category = category;
+        } else if (activeTab === 'games') {
+          data.url = finalUrl;
+          data.content = content;
+        }
+
+        await addDoc(collection(db, activeTab), data);
+        alert('发布成功！');
+        // Reset form
+        setTitle(''); setUrl(''); setVideoUrl(''); setContent(''); setFile(null);
+        fetchItems();
       }
-
-      const data: any = {
-        title,
-        createdAt: new Date().toISOString(),
-      };
-
-      if (activeTab === 'photos') {
-        data.url = finalUrl;
-      } else if (activeTab === 'videos') {
-        data.url = finalUrl; // thumbnail
-        data.videoUrl = videoUrl;
-        data.duration = "5:00"; // Default
-      } else if (activeTab === 'blogs') {
-        data.content = content;
-        data.category = category;
-      } else if (activeTab === 'games') {
-        data.url = finalUrl;
-        data.content = content;
-      }
-
-      await addDoc(collection(db, activeTab), data);
-      alert('发布成功！');
-      // Reset form
-      setTitle(''); setUrl(''); setVideoUrl(''); setContent(''); setFile(null);
-      fetchItems();
     } catch (error) {
       console.error("Error adding document:", error);
-      alert('发布失败');
+      alert('操作失败');
     }
     setLoading(false);
   };
@@ -178,6 +200,7 @@ export default function Admin() {
           <TabButton active={activeTab === 'videos'} onClick={() => setActiveTab('videos')} icon={<Video size={18} />} label="视频记录" />
           <TabButton active={activeTab === 'blogs'} onClick={() => setActiveTab('blogs')} icon={<FileText size={18} />} label="文字博客" />
           <TabButton active={activeTab === 'games'} onClick={() => setActiveTab('games')} icon={<Gamepad2 size={18} />} label="游戏生涯" />
+          <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={<Phone size={18} />} label="联系方式" />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-10">
@@ -185,22 +208,24 @@ export default function Admin() {
           <div className="lg:col-span-1">
             <div className="p-8 bg-zinc-900 rounded-3xl border border-zinc-800 sticky top-24">
               <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
-                <Plus size={20} /> 发布新内容
+                <Plus size={20} /> {activeTab === 'contacts' ? '编辑联系方式' : '发布新内容'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">标题</label>
-                  <input 
-                    type="text" 
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
-                    placeholder="输入标题..."
-                    required
-                  />
-                </div>
+                {activeTab !== 'contacts' && (
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">标题</label>
+                    <input 
+                      type="text" 
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                      placeholder="输入标题..."
+                      required
+                    />
+                  </div>
+                )}
 
-                {activeTab !== 'blogs' && (
+                {activeTab !== 'blogs' && activeTab !== 'contacts' && (
                   <div>
                     <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">图片/封面上传</label>
                     <div className="relative group">
@@ -282,20 +307,76 @@ export default function Admin() {
                   </div>
                 )}
 
+                {activeTab === 'contacts' && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Email</label>
+                      <input 
+                        type="email" 
+                        value={contactInfo.email}
+                        onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
+                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">GitHub 链接</label>
+                      <input 
+                        type="url" 
+                        value={contactInfo.github}
+                        onChange={(e) => setContactInfo({...contactInfo, github: e.target.value})}
+                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                        placeholder="https://github.com/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Twitter 链接</label>
+                      <input 
+                        type="url" 
+                        value={contactInfo.twitter}
+                        onChange={(e) => setContactInfo({...contactInfo, twitter: e.target.value})}
+                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                        placeholder="https://twitter.com/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">WeChat (微信号)</label>
+                      <input 
+                        type="text" 
+                        value={contactInfo.wechat}
+                        onChange={(e) => setContactInfo({...contactInfo, wechat: e.target.value})}
+                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                        placeholder="微信号"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">QQ 号</label>
+                      <input 
+                        type="text" 
+                        value={contactInfo.qq}
+                        onChange={(e) => setContactInfo({...contactInfo, qq: e.target.value})}
+                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+                        placeholder="QQ号"
+                      />
+                    </div>
+                  </>
+                )}
+
                 <button 
                   type="submit"
                   disabled={loading}
                   className="w-full py-3 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-colors disabled:opacity-50"
                 >
-                  {loading ? '发布中...' : '确认发布'}
+                  {loading ? '处理中...' : (activeTab === 'contacts' ? '保存联系方式' : '确认发布')}
                 </button>
               </form>
             </div>
           </div>
 
           {/* List Column */}
-          <div className="lg:col-span-2">
-            <div className="space-y-4">
+          {activeTab !== 'contacts' && (
+            <div className="lg:col-span-2">
+              <div className="space-y-4">
               {loading && items.length === 0 ? (
                 <div className="text-center py-20 text-zinc-500">加载中...</div>
               ) : items.length === 0 ? (
@@ -325,6 +406,7 @@ export default function Admin() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

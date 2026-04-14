@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Github, Twitter, Mail, Menu, X, Camera, Video as VideoIcon, BookOpen, Gamepad2, Home as HomeIcon } from 'lucide-react';
+import { Github, Twitter, Mail, Menu, X, Camera, Video as VideoIcon, BookOpen, Gamepad2, Home as HomeIcon, MessageCircle, MessageSquare } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Home from './pages/Home';
@@ -7,6 +7,7 @@ import Photography from './pages/Photography';
 import Video from './pages/Video';
 import Blog from './pages/Blog';
 import Game from './pages/Game';
+import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 
 function ScrollToTop() {
@@ -52,9 +53,9 @@ export default function App() {
               <Link to="/video" className="hover:text-zinc-100 transition-colors">视频</Link>
               <Link to="/blog" className="hover:text-zinc-100 transition-colors">博客</Link>
               <Link to="/game" className="hover:text-zinc-100 transition-colors">游戏</Link>
-              <a href="#contact" className="px-5 py-2 bg-zinc-100 text-zinc-900 font-bold rounded-full hover:bg-white transition-colors shadow-sm">
+              <Link to="/contact" className="px-5 py-2 bg-zinc-100 text-zinc-900 font-bold rounded-full hover:bg-white transition-colors shadow-sm">
                 联系我
-              </a>
+              </Link>
             </div>
           </div>
         </nav>
@@ -122,19 +123,22 @@ export default function App() {
             <Route path="/video" element={<Video />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
 
         {/* Footer */}
-        <footer id="contact" className="py-16 px-6 bg-zinc-950 border-t border-zinc-800 text-center">
+        <footer className="py-16 px-6 bg-zinc-950 border-t border-zinc-800 text-center">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold mb-3 text-zinc-100">拾壹屿</h2>
             <p className="text-zinc-500 italic mb-10 text-lg">永远相信美好的事情即将发生！</p>
             <div className="flex justify-center gap-6 mb-10">
-              <SocialLink icon={<Twitter size={22} />} href="#" />
-              <SocialLink icon={<Github size={22} />} href="#" />
-              <SocialLink icon={<Mail size={22} />} href="#" />
+              <SocialLink icon={<Twitter size={22} />} to="/contact" />
+              <SocialLink icon={<Github size={22} />} to="/contact" />
+              <SocialLink icon={<Mail size={22} />} to="/contact" />
+              <SocialLink icon={<MessageCircle size={22} />} to="/contact" />
+              <SocialLink icon={<MessageSquare size={22} />} to="/contact" />
             </div>
             <p className="text-zinc-600 text-sm font-medium">
               © {new Date().getFullYear()} 拾壹屿. All rights reserved.
@@ -147,14 +151,14 @@ export default function App() {
   );
 }
 
-function SocialLink({ icon, href }: { icon: React.ReactNode, href: string }) {
+function SocialLink({ icon, to }: { icon: React.ReactNode, to: string }) {
   return (
-    <a 
-      href={href}
+    <Link 
+      to={to}
       className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 hover:scale-110 transition-all duration-300"
     >
       {icon}
-    </a>
+    </Link>
   );
 }
 
