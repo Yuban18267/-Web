@@ -29,7 +29,7 @@ export default function Admin() {
     wechat: ''
   });
 
-  const ADMIN_PASSWORD = 'yuban18267';
+  const ADMIN_PASSWORD = 'Yuban18267';
 
   useEffect(() => {
     const authStatus = localStorage.getItem('admin_auth');
@@ -79,9 +79,17 @@ export default function Admin() {
 
   const handleFileUpload = async () => {
     if (!file) return null;
-    const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
+    try {
+      const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      if (error.code === 'storage/unauthorized') {
+        throw new Error('没有上传权限。请前往 Firebase Console -> Storage -> Rules，将规则修改为 allow read, write: if true; 才能允许未登录用户上传图片。');
+      }
+      throw new Error('图片上传失败，请检查网络或稍后重试。');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,9 +131,9 @@ export default function Admin() {
         setTitle(''); setUrl(''); setVideoUrl(''); setContent(''); setFile(null);
         fetchItems();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding document:", error);
-      alert('操作失败');
+      alert(error.message || '操作失败');
     }
     setLoading(false);
   };
