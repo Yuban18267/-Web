@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Photography from './pages/Photography';
 import Video from './pages/Video';
 import Blog from './pages/Blog';
+import Admin from './pages/Admin';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/photography" element={<Photography />} />
             <Route path="/video" element={<Video />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
 
@@ -55,6 +57,7 @@ export default function App() {
             <p className="text-zinc-600 text-sm font-medium">
               © {new Date().getFullYear()} 拾壹屿. All rights reserved.
             </p>
+            <Link to="/admin" className="text-zinc-800 hover:text-zinc-700 text-[10px] mt-4 inline-block">Admin</Link>
           </div>
         </footer>
       </div>

@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read access to all content
+    match /photos/{photoId} {
+      allow read: if true;
+      allow write: if true; // In a real app, we would restrict this to authenticated admins
+    }
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /blogs/{blogId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

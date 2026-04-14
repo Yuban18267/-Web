@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Photo": {
+      "title": "Photo",
+      "description": "A photography item",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "URL of the image" },
+        "title": { "type": "string", "description": "Title of the photo" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "createdAt"]
+    },
+    "Video": {
+      "title": "Video",
+      "description": "A video vlog item",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "Thumbnail URL" },
+        "videoUrl": { "type": "string", "description": "Link to the video (e.g. YouTube/Bilibili)" },
+        "title": { "type": "string", "description": "Title of the video" },
+        "duration": { "type": "string", "description": "Duration of the video" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "videoUrl", "title", "createdAt"]
+    },
+    "Blog": {
+      "title": "Blog",
+      "description": "A blog post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the post" },
+        "content": { "type": "string", "description": "Content of the post" },
+        "category": { "type": "string", "description": "Category of the post" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/photos/{photoId}": {
+      "schema": "Photo",
+      "description": "Collection of photography items"
+    },
+    "/videos/{videoId}": {
+      "schema": "Video",
+      "description": "Collection of video items"
+    },
+    "/blogs/{blogId}": {
+      "schema": "Blog",
+      "description": "Collection of blog posts"
+    }
+  }
+}

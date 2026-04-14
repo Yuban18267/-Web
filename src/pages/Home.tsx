@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Camera, Video, BookOpen, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { db } from '../lib/firebase';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -18,21 +20,42 @@ const staggerContainer = {
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
-  const images = [
-    "https://picsum.photos/seed/landscape1/1200/600",
-    "https://picsum.photos/seed/landscape2/1200/600",
-    "https://picsum.photos/seed/landscape3/1200/600",
-    "https://picsum.photos/seed/landscape4/1200/600"
-  ];
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [videos, setVideos] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const photoSnap = await getDocs(query(collection(db, 'photos'), orderBy('createdAt', 'desc'), limit(5)));
+        const videoSnap = await getDocs(query(collection(db, 'videos'), orderBy('createdAt', 'desc'), limit(2)));
+        const blogSnap = await getDocs(query(collection(db, 'blogs'), orderBy('createdAt', 'desc'), limit(3)));
+        
+        setPhotos(photoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setVideos(videoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setBlogs(blogSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (error) {
+        console.error("Error fetching home data:", error);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
-    setCurrentImage((prev) => (prev + 1) % images.length);
+    setCurrentImage((prev) => (prev + 1) % (photos.length || 1));
   };
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault();
-    setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImage((prev) => (prev - 1 + (photos.length || 1)) % (photos.length || 1));
   };
+
+  const displayPhotos = photos.length > 0 ? photos : [
+    { url: "https://picsum.photos/seed/landscape1/1200/600" },
+    { url: "https://picsum.photos/seed/landscape2/1200/600" }
+  ];
 
   return (
     <>
@@ -74,45 +97,31 @@ export default function Home() {
             </Link>
           </div>
           
-          {/* Carousel wrapped in Link */}
           <Link to="/photography" className="block relative rounded-2xl overflow-hidden bg-zinc-900 aspect-[16/9] md:aspect-[21/9] group shadow-2xl border border-zinc-800">
             <motion.img
               key={currentImage}
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              src={images[currentImage]}
-              alt={`Photography ${currentImage + 1}`}
+              src={displayPhotos[currentImage]?.url}
+              alt="Photography"
               className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
               referrerPolicy="no-referrer"
             />
             
-            {/* Carousel Controls */}
-            <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button 
-                onClick={prevImage}
-                className="w-12 h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"
-              >
-                <ChevronLeft size={28} />
-              </button>
-              <button 
-                onClick={nextImage}
-                className="w-12 h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"
-              >
-                <ChevronRight size={28} />
-              </button>
-            </div>
-            
-            {/* Indicators */}
-            <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => { e.preventDefault(); setCurrentImage(idx); }}
-                  className={`h-2 rounded-full transition-all duration-300 ${idx === currentImage ? 'bg-white w-8' : 'bg-white/30 w-2 hover:bg-white/60'}`}
-                />
-              ))}
-            </div>
+            {displayPhotos.length > 1 && (
+              <>
+                <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button onClick={prevImage} className="w-12 h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"><ChevronLeft size={28} /></button>
+                  <button onClick={nextImage} className="w-12 h-12 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"><ChevronRight size={28} /></button>
+                </div>
+                <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3">
+                  {displayPhotos.map((_, idx) => (
+                    <button key={idx} onClick={(e) => { e.preventDefault(); setCurrentImage(idx); }} className={`h-2 rounded-full transition-all duration-300 ${idx === currentImage ? 'bg-white w-8' : 'bg-white/30 w-2 hover:bg-white/60'}`} />
+                  ))}
+                </div>
+              </>
+            )}
           </Link>
         </motion.div>
       </section>
@@ -122,12 +131,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
           
           {/* Video Section */}
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <div className="flex items-center justify-between mb-8">
               <motion.div variants={fadeInUp} className="flex items-center gap-3">
                 <Video className="text-zinc-300" size={24} />
@@ -138,32 +142,29 @@ export default function Home() {
               </Link>
             </div>
             <div className="space-y-8">
-              {[1, 2].map((item) => (
-                <Link to="/video" key={item} className="block group cursor-pointer">
+              {videos.length > 0 ? videos.map((video) => (
+                <Link to="/video" key={video.id} className="block group cursor-pointer">
                   <motion.div variants={fadeInUp}>
                     <div className="aspect-video bg-zinc-900 rounded-2xl overflow-hidden relative mb-4 shadow-lg border border-zinc-800">
-                      <img src={`https://picsum.photos/seed/video${item}/600/400`} alt="Video thumbnail" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" referrerPolicy="no-referrer" />
+                      <img src={video.url} alt={video.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" referrerPolicy="no-referrer" />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors duration-500">
                         <div className="w-14 h-14 bg-zinc-900/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                           <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-zinc-100 border-b-[8px] border-b-transparent ml-1"></div>
                         </div>
                       </div>
                     </div>
-                    <h3 className="font-bold text-xl text-zinc-200 group-hover:text-white transition-colors">旅行 Vlog：山川与湖海的故事</h3>
-                    <p className="text-zinc-500 text-sm mt-2">2026年4月 • 5:24</p>
+                    <h3 className="font-bold text-xl text-zinc-200 group-hover:text-white transition-colors">{video.title}</h3>
+                    <p className="text-zinc-500 text-sm mt-2">{new Date(video.createdAt).toLocaleDateString()} • {video.duration}</p>
                   </motion.div>
                 </Link>
-              ))}
+              )) : (
+                <div className="py-10 text-center text-zinc-600 border border-dashed border-zinc-800 rounded-2xl">暂无视频</div>
+              )}
             </div>
           </motion.div>
 
           {/* Blog Section */}
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <div className="flex items-center justify-between mb-8">
               <motion.div variants={fadeInUp} className="flex items-center gap-3">
                 <BookOpen className="text-zinc-300" size={24} />
@@ -174,18 +175,18 @@ export default function Home() {
               </Link>
             </div>
             <div className="space-y-6">
-              {[1, 2, 3].map((item) => (
-                <Link to="/blog" key={item} className="block">
+              {blogs.length > 0 ? blogs.map((blog) => (
+                <Link to="/blog" key={blog.id} className="block">
                   <motion.div variants={fadeInUp} className="p-8 bg-zinc-900/50 rounded-2xl border border-zinc-800 hover:bg-zinc-900 hover:border-zinc-700 hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
-                    <p className="text-sm text-zinc-400 font-semibold tracking-wide mb-3 uppercase">随笔</p>
-                    <h3 className="font-bold text-2xl mb-3 text-zinc-200 group-hover:text-white transition-colors">在喧嚣中寻找内心的平静</h3>
-                    <p className="text-zinc-400 line-clamp-2 mb-6 leading-relaxed">
-                      摄影不仅仅是按下快门的那一瞬间，更是观察世界的一种方式。当我们放慢脚步，去注意那些平时被忽略的细节时...
-                    </p>
-                    <span className="text-sm text-zinc-500 font-medium">2026年4月9日</span>
+                    <p className="text-sm text-zinc-400 font-semibold tracking-wide mb-3 uppercase">{blog.category || '随笔'}</p>
+                    <h3 className="font-bold text-2xl mb-3 text-zinc-200 group-hover:text-white transition-colors">{blog.title}</h3>
+                    <p className="text-zinc-400 line-clamp-2 mb-6 leading-relaxed">{blog.content}</p>
+                    <span className="text-sm text-zinc-500 font-medium">{new Date(blog.createdAt).toLocaleDateString()}</span>
                   </motion.div>
                 </Link>
-              ))}
+              )) : (
+                <div className="py-10 text-center text-zinc-600 border border-dashed border-zinc-800 rounded-2xl">暂无博客</div>
+              )}
             </div>
           </motion.div>
 
