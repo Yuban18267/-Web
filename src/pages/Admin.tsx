@@ -142,7 +142,10 @@ export default function Admin() {
                 <li>进入你想要的文件夹后，点击左上角的 <strong>Add file -&gt; Upload files</strong> 把你的图片传上去（比如 <code>my-photo.jpg</code>）。</li>
                 <li>在 JSON 文件中（如 <code>photos.json</code>），将图片的 <code>url</code> 字段写成这样：
                   <br/>
-                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2 break-all">https://raw.githubusercontent.com/Yuban18267/-Web/main/public/images/你的图片名.jpg</code>
+                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2 break-all">/images/你的图片名.jpg</code>
+                  <div className="text-sm text-zinc-500 mt-2">
+                    系统内置了优化功能，你现在不再需要填写一长串 Github 连接，直接写相对路径 <code>/images/图片.jpg</code> 或从 GitHub 复制的 URL 都可以，系统会自动处理并加速国内访问！
+                  </div>
                 </li>
               </ol>
             </div>

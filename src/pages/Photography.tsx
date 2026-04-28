@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Camera } from 'lucide-react';
+import { getOptimizedImageUrl } from '../lib/utils';
 import photos from '../data/photos.json';
 
 export default function Photography() {
@@ -34,7 +35,7 @@ export default function Photography() {
               className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 group"
             >
               <img 
-                src={photo.url} 
+                src={getOptimizedImageUrl(photo.url)} 
                 alt={photo.title || `Photography ${i}`} 
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                 referrerPolicy="no-referrer"

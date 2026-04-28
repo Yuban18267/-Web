@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Gamepad2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getOptimizedImageUrl } from '../lib/utils';
 import games from '../data/games.json';
 
 export default function Game() {
@@ -38,7 +39,7 @@ export default function Game() {
               >
                 <div className="aspect-video overflow-hidden bg-slate-200 dark:bg-zinc-800">
                   <img 
-                    src={game.url} 
+                    src={getOptimizedImageUrl(game.url)} 
                     alt={game.title} 
                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                     referrerPolicy="no-referrer"

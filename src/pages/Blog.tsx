@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getOptimizedImageUrl } from '../lib/utils';
 import posts from '../data/blogs.json';
 
 export default function Blog() {
@@ -58,7 +59,7 @@ export default function Blog() {
                     {post.images.slice(0, 3).map((img, idx) => (
                       <div key={idx} className="aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 dark:bg-zinc-800">
                         <img 
-                          src={img} 
+                          src={getOptimizedImageUrl(img)} 
                           alt="Blog illustration" 
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
                           referrerPolicy="no-referrer"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Video as VideoIcon, Play } from 'lucide-react';
+import { getOptimizedImageUrl } from '../lib/utils';
 import videos from '../data/videos.json';
 
 export default function Video() {
@@ -35,7 +36,7 @@ export default function Video() {
             >
               <div className="aspect-video rounded-3xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 relative mb-6 shadow-2xl">
                 <img 
-                  src={video.url} 
+                  src={getOptimizedImageUrl(video.url)} 
                   alt={video.title} 
                   className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                   referrerPolicy="no-referrer"
