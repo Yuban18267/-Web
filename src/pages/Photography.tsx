@@ -31,7 +31,7 @@ export default function Photography() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i % 3 * 0.1 }}
-              className="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 group"
+              className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 group"
             >
               <img 
                 src={photo.url} 
@@ -39,6 +39,9 @@ export default function Photography() {
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                 referrerPolicy="no-referrer"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <span className="text-white font-medium text-lg">{photo.title}</span>
+              </div>
             </motion.div>
           ))}
         </div>

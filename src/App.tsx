@@ -7,7 +7,9 @@ import Home from './pages/Home';
 import Photography from './pages/Photography';
 import Video from './pages/Video';
 import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import Game from './pages/Game';
+import GameDetail from './pages/GameDetail';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import { useTheme } from './hooks/useTheme';
@@ -45,7 +47,9 @@ function AppRoutes() {
         <Route path="/photography" element={<PageTransition><Photography /></PageTransition>} />
         <Route path="/video" element={<PageTransition><Video /></PageTransition>} />
         <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
+        <Route path="/blog/:id" element={<PageTransition><BlogDetail /></PageTransition>} />
         <Route path="/game" element={<PageTransition><Game /></PageTransition>} />
+        <Route path="/game/:id" element={<PageTransition><GameDetail /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
       </Routes>
