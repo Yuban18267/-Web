@@ -95,23 +95,27 @@ export default function Admin() {
                 <li>打开你的 GitHub 仓库：<code>Yuban18267/-Web</code></li>
                 <li>找到并进入 <strong><code>src/data</code></strong> 文件夹。你会看到以下几个文件：
                   <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">contacts.json</code> - 管理联系我页面的邮箱、微信、QQ等</li>
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">blogs.json</code> - 管理文字博客</li>
+                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">contacts.json</code> - 管理联系我页面的邮箱、微信、QQ、B站、抖音、小红书等</li>
+                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">blogs.json</code> - 管理文字博客（支持多图并排）</li>
                     <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">games.json</code> - 管理游戏生涯</li>
                     <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">photos.json</code> - 管理摄影图片</li>
                     <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">videos.json</code> - 管理视频</li>
                   </ul>
                 </li>
                 <li><strong>点击你想修改的文件</strong>（比如 <code>blogs.json</code>），点击右上角的 ✏️ (铅笔图标) 编辑文件。</li>
-                <li>按照里面的 JSON 格式，复制一段 <code>{"{...}"}</code>，修改成你的内容。
+                <li>按照里面的 JSON 格式，复制一段 <code>{"{...}"}</code>，修改成你的内容。注意图文结合的使用方法：
                   <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl mt-2 text-xs font-mono overflow-auto border border-slate-200 dark:border-zinc-800">
 {`[
   {
-    "id": "1", // 每次新增一个，把 id 改成不一样的数字
-    "title": "我的新博客",
+    "id": "2", // 每次新增一个，把 id 改成不一样的数字
+    "title": "今天去看了海",
     "category": "随笔",
-    "content": "今天天气很好...",
-    "createdAt": "2024-04-14T10:00:00.000Z"
+    "content": "天气很好，拍了几张照片和大家分享。这几张照片很不错哦！",
+    "createdAt": "2024-04-14T10:00:00.000Z",
+    "images": [
+      "https://raw.githubusercontent.com/Yuban18267/-Web/main/public/images/sea-1.jpg",
+      "https://raw.githubusercontent.com/Yuban18267/-Web/main/public/images/sea-2.jpg"
+    ] // 如果没有图片，请直接删掉 "images" 这行。可以放一张或多张图片，页面会自动排版。
   }
 ]`}
                   </div>

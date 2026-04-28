@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Github, Twitter, Mail, Menu, X, Camera, Video as VideoIcon, BookOpen, Gamepad2, Home as HomeIcon, MessageCircle, MessageSquare, Sun, Moon, Monitor } from 'lucide-react';
+import { Github, Twitter, Mail, Menu, X, Camera, Video as VideoIcon, BookOpen, Gamepad2, Home as HomeIcon, Sun, Moon, Monitor } from 'lucide-react';
+import { QQIcon, BilibiliIcon, TiktokIcon } from './components/Icons';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Home from './pages/Home';
@@ -38,6 +39,7 @@ function AppRoutes() {
 
   return (
     <AnimatePresence mode="wait">
+      {/* @ts-ignore */}
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/photography" element={<PageTransition><Photography /></PageTransition>} />
@@ -193,11 +195,11 @@ export default function App() {
             <h2 className="text-3xl font-bold mb-3 text-slate-800 dark:text-zinc-100">拾壹屿</h2>
             <p className="text-slate-500 dark:text-zinc-500 italic mb-10 text-lg">永远相信美好的事情即将发生！</p>
             <div className="flex justify-center gap-6 mb-10">
-              <SocialLink icon={<Twitter size={22} />} to="/contact" />
-              <SocialLink icon={<Github size={22} />} to="/contact" />
               <SocialLink icon={<Mail size={22} />} to="/contact" />
-              <SocialLink icon={<MessageCircle size={22} />} to="/contact" />
-              <SocialLink icon={<MessageSquare size={22} />} to="/contact" />
+              <SocialLink icon={<Github size={22} />} to="/contact" />
+              <SocialLink icon={<BilibiliIcon size={22} />} to="/contact" />
+              <SocialLink icon={<TiktokIcon size={22} />} to="/contact" />
+              <SocialLink icon={<QQIcon size={22} />} to="/contact" />
             </div>
             <p className="text-slate-500 dark:text-zinc-600 text-sm font-medium">
               © {new Date().getFullYear()} 拾壹屿. All rights reserved.

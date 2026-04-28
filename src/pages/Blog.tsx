@@ -44,6 +44,26 @@ export default function Blog() {
               <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-lg mb-6 whitespace-pre-wrap">
                 {post.content}
               </p>
+              
+              {'images' in post && Array.isArray(post.images) && post.images.length > 0 && (
+                <div className={`grid gap-3 mb-6 ${
+                  post.images.length === 1 ? 'grid-cols-1 md:w-2/3' : 
+                  post.images.length === 2 ? 'grid-cols-2 lg:w-3/4' : 
+                  'grid-cols-2 md:grid-cols-3'
+                }`}>
+                  {post.images.map((img, idx) => (
+                    <div key={idx} className="aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 dark:bg-zinc-800">
+                      <img 
+                        src={img} 
+                        alt="Blog illustration" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="text-zinc-700 dark:text-zinc-300 font-medium group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
                 阅读全文 →
               </div>

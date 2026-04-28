@@ -1,6 +1,7 @@
 import React from 'react';
-import { motion } from 'motion/react';
-import { Twitter, Github, Mail, MessageCircle, MessageSquare } from 'lucide-react';
+import { motion, Variants } from 'motion/react';
+import { Twitter, Github, Mail } from 'lucide-react';
+import { QQIcon, WeChatIcon, BilibiliIcon, TiktokIcon, XiaohongshuIcon } from '../components/Icons';
 import contactInfo from '../data/contacts.json';
 
 export default function Contact() {
@@ -22,6 +23,30 @@ export default function Contact() {
       color: 'hover:text-zinc-900 dark:text-zinc-100 hover:border-zinc-100/50 hover:bg-zinc-100/10'
     },
     {
+      id: 'bilibili',
+      icon: <BilibiliIcon size={32} />,
+      label: '哔哩哔哩',
+      value: (contactInfo as any).bilibili || '未设置',
+      href: (contactInfo as any).bilibili || '#',
+      color: 'hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-400/10'
+    },
+    {
+      id: 'tiktok',
+      icon: <TiktokIcon size={32} />,
+      label: '抖音',
+      value: (contactInfo as any).tiktok || '未设置',
+      href: (contactInfo as any).tiktok || '#',
+      color: 'hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-900/50 hover:bg-zinc-900/10 dark:hover:border-zinc-100/50 dark:hover:bg-zinc-100/10'
+    },
+    {
+      id: 'xiaohongshu',
+      icon: <XiaohongshuIcon size={32} />,
+      label: '小红书',
+      value: (contactInfo as any).xiaohongshu || '未设置',
+      href: (contactInfo as any).xiaohongshu || '#',
+      color: 'hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10'
+    },
+    {
       id: 'twitter',
       icon: <Twitter size={32} />,
       label: 'Twitter',
@@ -31,7 +56,7 @@ export default function Contact() {
     },
     {
       id: 'wechat',
-      icon: <MessageCircle size={32} />,
+      icon: <WeChatIcon size={32} />,
       label: 'WeChat',
       value: contactInfo.wechat || '未设置',
       href: '#',
@@ -40,7 +65,7 @@ export default function Contact() {
     },
     {
       id: 'qq',
-      icon: <MessageSquare size={32} />,
+      icon: <QQIcon size={32} />,
       label: 'QQ',
       value: contactInfo.qq || '未设置',
       href: '#',
