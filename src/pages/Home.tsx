@@ -64,7 +64,7 @@ export default function Home() {
             className="max-w-3xl mx-auto"
           >
             <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-8 leading-tight min-h-[1.2em]">
-              你好，我是<span className="text-zinc-600 dark:text-zinc-400 inline-block min-w-[3em]">{displayText}<span className="animate-pulse">|</span></span>
+              你好，我是<span className="text-blue-600 dark:text-blue-500 inline-block min-w-[3em]">{displayText}<span className="animate-pulse">|</span></span>
             </h1>
             <p className="text-lg md:text-xl text-zinc-500 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
               用镜头捕捉光影，用文字记录生活。这里是我的个人空间，分享我的摄影作品、视频记录和日常随笔。

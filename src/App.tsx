@@ -24,10 +24,10 @@ function ThemeToggle() {
   return (
     <button 
       onClick={toggleTheme}
-      className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400 hover:text-accent dark:hover:text-zinc-100"
+      className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-100"
       aria-label="Toggle theme"
     >
-      {theme === 'light' ? <Sun size={20} /> : theme === 'dark' ? <Moon size={20} /> : <Monitor size={20} />}
+      {theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
     </button>
   );
 }
@@ -56,6 +56,7 @@ export default function App() {
 
   const navLinks = [
     { to: "/", label: "主页", icon: <HomeIcon size={20} /> },
+    { to: "/photography", label: "摄影作品", icon: <Camera size={20} /> },
     { to: "/video", label: "旅行视频", icon: <VideoIcon size={20} /> },
     { to: "/blog", label: "个人随笔", icon: <BookOpen size={20} /> },
     { to: "/game", label: "游戏生涯", icon: <Gamepad2 size={20} /> },
@@ -72,8 +73,8 @@ export default function App() {
   };
 
   const staggerItem = {
-    hidden: { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+    hidden: { opacity: 0, x: 50, scale: 0.9 },
+    show: { opacity: 1, x: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 25 } }
   };
 
   return (
@@ -86,20 +87,20 @@ export default function App() {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsMenuOpen(true)}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400 hover:text-accent dark:hover:text-zinc-100"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-100"
               >
                 <Menu size={24} />
               </button>
-              <Link to="/" className="text-xl font-bold tracking-tighter hover:text-accent dark:hover:text-zinc-300 transition-colors">
+              <Link to="/" className="text-xl font-bold tracking-tighter text-blue-600 dark:text-zinc-100 hover:text-blue-700 dark:hover:text-zinc-300 transition-colors">
                 拾壹屿
               </Link>
             </div>
             
             <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-zinc-400">
-              <Link to="/photography" className="hover:text-accent dark:hover:text-zinc-100 transition-colors">摄影</Link>
-              <Link to="/video" className="hover:text-accent dark:hover:text-zinc-100 transition-colors">视频</Link>
-              <Link to="/blog" className="hover:text-accent dark:hover:text-zinc-100 transition-colors">博客</Link>
-              <Link to="/game" className="hover:text-accent dark:hover:text-zinc-100 transition-colors">游戏</Link>
+              <Link to="/photography" className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors">摄影</Link>
+              <Link to="/video" className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors">视频</Link>
+              <Link to="/blog" className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors">博客</Link>
+              <Link to="/game" className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors">游戏</Link>
               <ThemeToggle />
               <Link to="/contact" className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-zinc-100 dark:text-zinc-900 font-bold rounded-full dark:hover:bg-white transition-colors shadow-sm">
                 联系我
