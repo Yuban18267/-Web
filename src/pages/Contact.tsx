@@ -19,7 +19,7 @@ export default function Contact() {
       label: 'GitHub',
       value: contactInfo.github || '未设置',
       href: contactInfo.github || '#',
-      color: 'hover:text-zinc-100 hover:border-zinc-100/50 hover:bg-zinc-100/10'
+      color: 'hover:text-zinc-900 dark:text-zinc-100 hover:border-zinc-100/50 hover:bg-zinc-100/10'
     },
     {
       id: 'twitter',
@@ -63,8 +63,8 @@ export default function Contact() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-16 text-center"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-6">联系我</h1>
-        <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">联系我</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto text-lg">
           欢迎通过以下方式与我取得联系，无论是交流技术、分享生活还是合作意向。
         </p>
       </motion.div>
@@ -80,13 +80,13 @@ export default function Contact() {
             {method.copyable ? (
               <div 
                 onClick={() => handleCopy(method.value)}
-                className={`flex flex-col items-center justify-center p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl transition-all duration-300 cursor-pointer group ${method.color}`}
+                className={`flex flex-col items-center justify-center p-8 bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 rounded-3xl transition-all duration-300 cursor-pointer group ${method.color}`}
               >
                 <div className="text-zinc-500 mb-4 transition-colors duration-300 group-hover:text-inherit">
                   {method.icon}
                 </div>
-                <h3 className="text-lg font-bold text-zinc-100 mb-2">{method.label}</h3>
-                <p className="text-sm text-zinc-400 text-center break-all">{method.value}</p>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{method.label}</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">{method.value}</p>
                 <p className="text-xs text-zinc-600 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">点击复制</p>
               </div>
             ) : (
@@ -94,13 +94,13 @@ export default function Contact() {
                 href={method.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex flex-col items-center justify-center p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl transition-all duration-300 group ${method.color}`}
+                className={`flex flex-col items-center justify-center p-8 bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 rounded-3xl transition-all duration-300 group ${method.color}`}
               >
                 <div className="text-zinc-500 mb-4 transition-colors duration-300 group-hover:text-inherit">
                   {method.icon}
                 </div>
-                <h3 className="text-lg font-bold text-zinc-100 mb-2">{method.label}</h3>
-                <p className="text-sm text-zinc-400 text-center break-all">{method.value}</p>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{method.label}</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">{method.value}</p>
               </a>
             )}
           </motion.div>

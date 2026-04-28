@@ -19,26 +19,26 @@ export default function Admin() {
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-6">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950 px-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md p-8 bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl"
+          className="w-full max-w-md p-8 bg-slate-100 dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-2xl"
         >
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center">
-              <Lock className="text-zinc-400" size={32} />
+            <div className="w-16 h-16 bg-slate-200 dark:bg-zinc-800 rounded-2xl flex items-center justify-center">
+              <Lock className="text-zinc-600 dark:text-zinc-400" size={32} />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center text-zinc-100 mb-8">管理后台登录</h1>
+          <h1 className="text-2xl font-bold text-center text-zinc-900 dark:text-zinc-100 mb-8">管理后台登录</h1>
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">请输入管理员密码</label>
+              <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">请输入管理员密码</label>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all"
+                className="w-full px-4 py-3 bg-slate-200 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all"
                 placeholder="••••••••"
                 required
               />
@@ -56,7 +56,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 pt-24 pb-24 px-6">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24 pb-24 px-6">
       <div className="max-w-4xl mx-auto">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -67,31 +67,31 @@ export default function Admin() {
               <CheckCircle2 className="text-green-500" size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-zinc-100">由于网络原因，管理方式已全新升级！</h1>
-              <p className="text-zinc-400 mt-2">完全免费、极速、无需数据库的 Git 内容管理方案</p>
+              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">由于网络原因，管理方式已全新升级！</h1>
+              <p className="text-zinc-600 dark:text-zinc-400 mt-2">完全免费、极速、无需数据库的 Git 内容管理方案</p>
             </div>
           </div>
 
           <div className="prose prose-invert prose-zinc max-w-none">
-            <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-3xl mb-8">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl mb-8">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 <FileJson className="text-blue-400" /> 为什么要这样改？
               </h3>
-              <p className="text-zinc-400 leading-relaxed mb-4">
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
                 之前你遇到的 <strong>“图片一直显示处理中”</strong> 以及 <strong>“文字配置一刷新网页就没了”</strong> 的问题，是因为 Firebase 数据库的服务器被国内网络屏障（GFW）阻挡，导致你的浏览器无法成功将数据发送给 Google 的服务器。
               </p>
-              <p className="text-zinc-400 leading-relaxed">
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 为了彻底解决这个问题，并且让你更方便地管理（比如直接使用 GitHub 管理），我帮你去掉了所有复杂的数据库，把网站改造成了 <strong>“Git-based CMS (基于 Git 的静态内容管理)”</strong>。
                 <br /><br />
                 这意味着：你的所有博客、联系方式、图片数据，现在都变成了纯文本的 JSON 文件，直接保存在你的代码仓库里。<strong>Vercel 每次检测到你修改了这些文件，就会自动重新部署一次！</strong> 速度不仅极快，并且国内访问永远不会卡数据库。
               </p>
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-3xl mb-8">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Github className="text-zinc-300" /> 如何发布新内容 / 修改联系方式？
+            <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl mb-8">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <Github className="text-zinc-700 dark:text-zinc-300" /> 如何发布新内容 / 修改联系方式？
               </h3>
-              <ol className="list-decimal pl-5 space-y-4 text-zinc-400">
+              <ol className="list-decimal pl-5 space-y-4 text-zinc-600 dark:text-zinc-400">
                 <li>打开你的 GitHub 仓库：<code>Yuban18267/-Web</code></li>
                 <li>找到并进入 <strong><code>src/data</code></strong> 文件夹。你会看到以下几个文件：
                   <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
@@ -104,7 +104,7 @@ export default function Admin() {
                 </li>
                 <li><strong>点击你想修改的文件</strong>（比如 <code>blogs.json</code>），点击右上角的 ✏️ (铅笔图标) 编辑文件。</li>
                 <li>按照里面的 JSON 格式，复制一段 <code>{"{...}"}</code>，修改成你的内容。
-                  <div className="bg-zinc-950 p-4 rounded-xl mt-2 text-xs font-mono overflow-auto border border-zinc-800">
+                  <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl mt-2 text-xs font-mono overflow-auto border border-slate-200 dark:border-zinc-800">
 {`[
   {
     "id": "1", // 每次新增一个，把 id 改成不一样的数字
@@ -121,14 +121,14 @@ export default function Admin() {
               </ol>
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-3xl">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 <ImageIcon className="text-purple-400" /> 如何上传图片？
               </h3>
-              <p className="text-zinc-400 leading-relaxed mb-4">
+              <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
                 同样使用 GitHub 管理即可，完全免费且和代码绑在一起：
               </p>
-              <ol className="list-decimal pl-5 space-y-4 text-zinc-400">
+              <ol className="list-decimal pl-5 space-y-4 text-zinc-600 dark:text-zinc-400">
                 <li>在你的 GitHub 仓库根目录，找到 <code>public</code> 文件夹（如果没有可以新建 <code>public/images</code>）。</li>
                 <li>点击 <strong>Add file -&gt; Upload files</strong> 把你的图片传上去（比如 <code>my-photo.jpg</code>）。</li>
                 <li>在 JSON 文件中（如 <code>photos.json</code>），将图片的 <code>url</code> 字段写成这样：

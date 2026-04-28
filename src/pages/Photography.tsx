@@ -12,14 +12,14 @@ export default function Photography() {
         className="mb-16 text-center"
       >
         <Camera className="mx-auto text-zinc-500 mb-6" size={48} />
-        <h1 className="text-4xl md:text-5xl font-bold text-zinc-100 mb-6">摄影作品</h1>
-        <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">摄影作品</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto text-lg">
           用镜头记录下的每一个瞬间。这里收集了我在旅途中、生活里捕捉到的光影碎片。
         </p>
       </motion.div>
 
       {photos.length === 0 ? (
-        <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-3xl border border-zinc-800">
+        <div className="text-center py-20 text-zinc-500 bg-slate-100 dark:bg-zinc-900/30 rounded-3xl border border-slate-200 dark:border-zinc-800">
           暂无作品。
         </div>
       ) : (
@@ -31,7 +31,7 @@ export default function Photography() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i % 3 * 0.1 }}
-              className="aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 group"
+              className="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 group"
             >
               <img 
                 src={photo.url} 
