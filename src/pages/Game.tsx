@@ -1,27 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Gamepad2 } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import games from '../data/games.json';
 
 export default function Game() {
-  const [games, setGames] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const q = query(collection(db, 'games'), orderBy('createdAt', 'desc'));
-        const snapshot = await getDocs(q);
-        setGames(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      } catch (error) {
-        console.error("Error fetching games:", error);
-      }
-      setLoading(false);
-    };
-    fetchGames();
-  }, []);
-
   return (
     <div className="pt-24 pb-24 px-6 max-w-6xl mx-auto min-h-screen">
       <motion.div 
@@ -36,11 +18,9 @@ export default function Game() {
         </p>
       </motion.div>
 
-      {loading ? (
-        <div className="text-center py-20 text-zinc-500">加载中...</div>
-      ) : games.length === 0 ? (
+      {games.length === 0 ? (
         <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-2xl border border-zinc-800">
-          暂无记录，请在管理后台发布。
+          暂无记录。
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

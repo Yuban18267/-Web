@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Camera, Video, BookOpen, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { db } from '../lib/firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import photosData from '../data/photos.json';
+import videosData from '../data/videos.json';
+import blogsData from '../data/blogs.json';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -20,12 +21,12 @@ const staggerContainer = {
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [videos, setVideos] = useState<any[]>([]);
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [displayText, setDisplayText] = useState('');
   const fullText = '拾壹屿';
+
+  const photos = photosData.slice(0, 5);
+  const videos = videosData.slice(0, 2);
+  const blogs = blogsData.slice(0, 3);
 
   useEffect(() => {
     let i = 0;
@@ -35,24 +36,6 @@ export default function Home() {
       if (i > fullText.length) clearInterval(timer);
     }, 200);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const photoSnap = await getDocs(query(collection(db, 'photos'), orderBy('createdAt', 'desc'), limit(5)));
-        const videoSnap = await getDocs(query(collection(db, 'videos'), orderBy('createdAt', 'desc'), limit(2)));
-        const blogSnap = await getDocs(query(collection(db, 'blogs'), orderBy('createdAt', 'desc'), limit(3)));
-        
-        setPhotos(photoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setVideos(videoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setBlogs(blogSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      } catch (error) {
-        console.error("Error fetching home data:", error);
-      }
-      setLoading(false);
-    };
-    fetchData();
   }, []);
 
   const nextImage = (e: React.MouseEvent) => {
@@ -166,7 +149,7 @@ export default function Home() {
                       </div>
                     </div>
                     <h3 className="font-bold text-xl text-zinc-200 group-hover:text-white transition-colors">{video.title}</h3>
-                    <p className="text-zinc-500 text-sm mt-2">{new Date(video.createdAt).toLocaleDateString()} • {video.duration}</p>
+                    <p className="text-zinc-500 text-sm mt-2">{new Date(video.createdAt).toLocaleDateString()} • {video.duration || '00:00'}</p>
                   </motion.div>
                 </Link>
               )) : (

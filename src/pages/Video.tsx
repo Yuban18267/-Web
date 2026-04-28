@@ -1,27 +1,9 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Video as VideoIcon, Play } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import videos from '../data/videos.json';
 
 export default function Video() {
-  const [videos, setVideos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
-        const snapshot = await getDocs(q);
-        setVideos(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-      setLoading(false);
-    };
-    fetchVideos();
-  }, []);
-
   return (
     <div className="pt-24 pb-24 px-6 max-w-5xl mx-auto min-h-screen">
       <motion.div 
@@ -36,11 +18,9 @@ export default function Video() {
         </p>
       </motion.div>
 
-      {loading ? (
-        <div className="text-center py-20 text-zinc-500">加载中...</div>
-      ) : videos.length === 0 ? (
+      {videos.length === 0 ? (
         <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-3xl border border-zinc-800">
-          暂无视频，请在管理后台上传。
+          暂无视频。
         </div>
       ) : (
         <div className="space-y-12">

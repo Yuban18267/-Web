@@ -1,27 +1,9 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { BookOpen } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import posts from '../data/blogs.json';
 
 export default function Blog() {
-  const [posts, setPosts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const q = query(collection(db, 'blogs'), orderBy('createdAt', 'desc'));
-        const snapshot = await getDocs(q);
-        setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-      setLoading(false);
-    };
-    fetchPosts();
-  }, []);
-
   return (
     <div className="pt-24 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
       <motion.div 
@@ -36,11 +18,9 @@ export default function Blog() {
         </p>
       </motion.div>
 
-      {loading ? (
-        <div className="text-center py-20 text-zinc-500">加载中...</div>
-      ) : posts.length === 0 ? (
+      {posts.length === 0 ? (
         <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-3xl border border-zinc-800">
-          暂无随笔，请在管理后台发布。
+          暂无随笔。
         </div>
       ) : (
         <div className="space-y-8">
