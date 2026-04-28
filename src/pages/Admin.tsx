@@ -133,11 +133,16 @@ export default function Admin() {
                 同样使用 GitHub 管理即可，完全免费且和代码绑在一起：
               </p>
               <ol className="list-decimal pl-5 space-y-4 text-zinc-600 dark:text-zinc-400">
-                <li>在你的 GitHub 仓库根目录，找到 <code>public</code> 文件夹（如果没有可以新建 <code>public/images</code>）。</li>
-                <li>点击 <strong>Add file -&gt; Upload files</strong> 把你的图片传上去（比如 <code>my-photo.jpg</code>）。</li>
+                <li>在你的 GitHub 仓库（<code>main</code> 页面），找到 <code>public/images</code> 文件夹。
+                  <div className="text-sm bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 p-3 rounded-lg border border-blue-100 dark:border-blue-800/30 mt-2">
+                    💡 <strong>如果需要在 GitHub 上手动创建新文件夹（例如你想新建 <code>public/covers</code>）：</strong><br />
+                    点击 <strong>Add file -&gt; Create new file</strong>，在输入文件名的框里输入 <code>public/covers/</code>（注意最后的斜杠 <code>/</code>）。输入斜杠后，GitHub 会自动把它变成一个文件夹！然后随便写个文件名比如 <code>.keep</code>，提交即可生效。
+                  </div>
+                </li>
+                <li>进入你想要的文件夹后，点击左上角的 <strong>Add file -&gt; Upload files</strong> 把你的图片传上去（比如 <code>my-photo.jpg</code>）。</li>
                 <li>在 JSON 文件中（如 <code>photos.json</code>），将图片的 <code>url</code> 字段写成这样：
                   <br/>
-                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2">https://raw.githubusercontent.com/Yuban18267/-Web/main/public/images/你的图片名.jpg</code>
+                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2 break-all">https://raw.githubusercontent.com/Yuban18267/-Web/main/public/images/你的图片名.jpg</code>
                 </li>
               </ol>
             </div>
