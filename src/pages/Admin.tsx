@@ -149,6 +149,37 @@ export default function Admin() {
                 只需要进入网站，拖入图片，复制得到的图片直链（URL），填入 JSON 文件即可。
               </p>
             </div>
+
+            <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                💡 常见问题解答
+              </h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q1: 设置专门的图片 Git 仓库时，可以设为“私密” (Private) 吗？</h4>
+                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+                    <strong>绝对不可以。</strong> 你的个人网站是公开访问的，游客的浏览器需要去读取你的图片。如果是私密仓库，获取 <code>raw.githubusercontent.com</code> 的链接会被认定为无权限读取，全都会加载失败（显示 404）。<strong>请务必将图床仓库设置为 Public。</strong>如果不希望某些私密照片被看见，请不要上传。
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q2: Github 空间有多大？上传照片会不够用吗？</h4>
+                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+                    GitHub 免费账户对于单个仓库也有极强的包容度。虽然没有明确的上限硬指标，但官方建议<strong>单个仓库保持在 1GB ~ 5GB 以下</strong>，单张图片不能超过 100MB。<br/><br/>
+                    对于个人的网页展示，上传几个章节的摄影作品空间是<strong>完全管够的</strong>！但为了你的网站加载速度，强烈建议每次上传前，用压缩工具（例如 <a href="https://tinypng.com/" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">TinyPNG</a>）或者美图秀秀等把每张原图压缩到 <strong>1MB ~ 2MB 以下</strong>。
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q3: 页面标题和网页左上角的网页图标 (Favicon) 如何更换？</h4>
+                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
+                    我已经为你定制并替换了默认图标，换成了带有数字 "11" 且符合整站暗调风格的极简 Logo！同时页面抬头也改成了 "11island personal net"。<br /><br />
+                    如果你未来想自己换别的图标，只需要：在代码仓库中进入 <code>public/</code> 文件夹，删掉原有的 <code>favicon.svg</code> 文件，然后上传一张你自己喜欢的方形图片并将其命名为 <code>favicon.ico</code> 或修改 <code>index.html</code> 里的路径即可。
+                  </p>
+                </div>
+              </div>
+            </div>
             
           </div>
         </motion.div>
