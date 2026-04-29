@@ -1,94 +1,108 @@
-import React from 'react';
-import { motion, Variants } from 'motion/react';
-import { Twitter, Github, Mail } from 'lucide-react';
-import { QQIcon, WeChatIcon, BilibiliIcon, TiktokIcon, XiaohongshuIcon } from '../components/Icons';
-import contactInfo from '../data/contacts.json';
+import React from "react";
+import { motion, Variants } from "motion/react";
+import { Twitter, Github, Mail } from "lucide-react";
+import {
+  QQIcon,
+  WeChatIcon,
+  BilibiliIcon,
+  TiktokIcon,
+  XiaohongshuIcon,
+} from "../components/Icons";
+import contactInfo from "../data/contacts.json";
 
 export default function Contact() {
   const contactMethods = [
     {
-      id: 'email',
+      id: "email",
       icon: <Mail size={32} />,
-      label: 'Email',
-      value: contactInfo.email || '未设置',
-      href: contactInfo.email ? `mailto:${contactInfo.email}` : '#',
-      color: 'hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-400/10'
+      label: "Email",
+      value: contactInfo.email || "未设置",
+      href: contactInfo.email ? `mailto:${contactInfo.email}` : "#",
+      color:
+        "hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-400/10",
     },
     {
-      id: 'github',
+      id: "github",
       icon: <Github size={32} />,
-      label: 'GitHub',
-      value: contactInfo.github || '未设置',
-      href: contactInfo.github || '#',
-      color: 'hover:text-zinc-900 dark:text-zinc-100 hover:border-zinc-100/50 hover:bg-zinc-100/10'
+      label: "GitHub",
+      value: contactInfo.github || "未设置",
+      href: contactInfo.github || "#",
+      color:
+        "hover:text-zinc-900 dark:text-zinc-100 hover:border-zinc-100/50 hover:bg-zinc-100/10",
     },
     {
-      id: 'bilibili',
+      id: "bilibili",
       icon: <BilibiliIcon size={32} />,
-      label: '哔哩哔哩',
-      value: (contactInfo as any).bilibili || '未设置',
-      href: (contactInfo as any).bilibili || '#',
-      color: 'hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-400/10'
+      label: "哔哩哔哩",
+      value: (contactInfo as any).bilibili || "未设置",
+      href: (contactInfo as any).bilibili || "#",
+      color:
+        "hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-400/10",
     },
     {
-      id: 'tiktok',
+      id: "tiktok",
       icon: <TiktokIcon size={32} />,
-      label: '抖音',
-      value: (contactInfo as any).tiktok || '未设置',
-      href: (contactInfo as any).tiktok || '#',
-      color: 'hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-900/50 hover:bg-zinc-900/10 dark:hover:border-zinc-100/50 dark:hover:bg-zinc-100/10'
+      label: "抖音",
+      value: (contactInfo as any).tiktok || "未设置",
+      href: (contactInfo as any).tiktok || "#",
+      color:
+        "hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-900/50 hover:bg-zinc-900/10 dark:hover:border-zinc-100/50 dark:hover:bg-zinc-100/10",
     },
     {
-      id: 'xiaohongshu',
+      id: "xiaohongshu",
       icon: <XiaohongshuIcon size={32} />,
-      label: '小红书',
-      value: (contactInfo as any).xiaohongshu || '未设置',
-      href: (contactInfo as any).xiaohongshu || '#',
-      color: 'hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10'
+      label: "小红书",
+      value: (contactInfo as any).xiaohongshu || "未设置",
+      href: (contactInfo as any).xiaohongshu || "#",
+      color: "hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10",
     },
     {
-      id: 'twitter',
+      id: "twitter",
       icon: <Twitter size={32} />,
-      label: 'Twitter',
-      value: contactInfo.twitter || '未设置',
-      href: contactInfo.twitter || '#',
-      color: 'hover:text-sky-400 hover:border-sky-400/50 hover:bg-sky-400/10'
+      label: "Twitter",
+      value: contactInfo.twitter || "未设置",
+      href: contactInfo.twitter || "#",
+      color: "hover:text-sky-400 hover:border-sky-400/50 hover:bg-sky-400/10",
     },
     {
-      id: 'wechat',
+      id: "wechat",
       icon: <WeChatIcon size={32} />,
-      label: 'WeChat',
-      value: contactInfo.wechat || '未设置',
-      href: '#',
-      color: 'hover:text-green-500 hover:border-green-500/50 hover:bg-green-500/10',
-      copyable: true
+      label: "WeChat",
+      value: contactInfo.wechat || "未设置",
+      href: "#",
+      color:
+        "hover:text-green-500 hover:border-green-500/50 hover:bg-green-500/10",
+      copyable: true,
     },
     {
-      id: 'qq',
+      id: "qq",
       icon: <QQIcon size={32} />,
-      label: 'QQ',
-      value: contactInfo.qq || '未设置',
-      href: '#',
-      color: 'hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/10',
-      copyable: true
-    }
+      label: "QQ",
+      value: contactInfo.qq || "未设置",
+      href: "#",
+      color:
+        "hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/10",
+      copyable: true,
+    },
   ];
 
   const handleCopy = (text: string) => {
-    if (text && text !== '未设置') {
+    if (text && text !== "未设置") {
       navigator.clipboard.writeText(text);
-      alert('已复制到剪贴板: ' + text);
+      alert("已复制到剪贴板: " + text);
     }
   };
 
   return (
     <div className="pt-32 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-16 text-center"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">联系我</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+          联系我
+        </h1>
         <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto text-lg">
           欢迎通过以下方式与我取得联系，无论是交流技术、分享生活还是合作意向。
         </p>
@@ -103,19 +117,25 @@ export default function Contact() {
             transition={{ delay: index * 0.1 }}
           >
             {method.copyable ? (
-              <div 
+              <div
                 onClick={() => handleCopy(method.value)}
                 className={`flex flex-col items-center justify-center p-8 bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 rounded-3xl transition-all duration-300 cursor-pointer group ${method.color}`}
               >
                 <div className="text-zinc-500 mb-4 transition-colors duration-300 group-hover:text-inherit">
                   {method.icon}
                 </div>
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{method.label}</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">{method.value}</p>
-                <p className="text-xs text-zinc-600 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">点击复制</p>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+                  {method.label}
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">
+                  {method.value}
+                </p>
+                <p className="text-xs text-zinc-600 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  点击复制
+                </p>
               </div>
             ) : (
-              <a 
+              <a
                 href={method.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -124,8 +144,12 @@ export default function Contact() {
                 <div className="text-zinc-500 mb-4 transition-colors duration-300 group-hover:text-inherit">
                   {method.icon}
                 </div>
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">{method.label}</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">{method.value}</p>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+                  {method.label}
+                </h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center break-all">
+                  {method.value}
+                </p>
               </a>
             )}
           </motion.div>

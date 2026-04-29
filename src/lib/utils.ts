@@ -20,7 +20,7 @@ export function getOptimizedImageUrl(url: string): string {
 
   // Rewrite raw.githubusercontent.com to proxy because GFW blocks it in Mainland China
   if (url.includes('raw.githubusercontent.com')) {
-    return 'https://mirror.ghproxy.com/' + url;
+    return 'https://ghproxy.net/' + url;
   }
   
   return url;

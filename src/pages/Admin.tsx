@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Lock, Github, CheckCircle2, FileJson, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from "react";
+import { motion } from "motion/react";
+import {
+  Lock,
+  Github,
+  CheckCircle2,
+  FileJson,
+  Image as ImageIcon,
+} from "lucide-react";
 
 export default function Admin() {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
 
-  const ADMIN_PASSWORD = 'Yuban18267';
+  const ADMIN_PASSWORD = "Yuban18267";
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
       setIsAuthorized(true);
     } else {
-      alert('密码错误');
+      alert("密码错误");
     }
   };
 
   if (!isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950 px-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md p-8 bg-slate-100 dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-2xl"
@@ -30,12 +36,16 @@ export default function Admin() {
               <Lock className="text-zinc-600 dark:text-zinc-400" size={32} />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center text-zinc-900 dark:text-zinc-100 mb-8">管理后台登录</h1>
+          <h1 className="text-2xl font-bold text-center text-zinc-900 dark:text-zinc-100 mb-8">
+            管理后台登录
+          </h1>
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">请输入管理员密码</label>
-              <input 
-                type="password" 
+              <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                请输入管理员密码
+              </label>
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 bg-slate-200 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all"
@@ -43,7 +53,7 @@ export default function Admin() {
                 required
               />
             </div>
-            <button 
+            <button
               type="submit"
               className="w-full py-3 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-colors"
             >
@@ -58,7 +68,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24 pb-24 px-6">
       <div className="max-w-4xl mx-auto">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -67,8 +77,12 @@ export default function Admin() {
               <CheckCircle2 className="text-green-500" size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">由于网络原因，管理方式已全新升级！</h1>
-              <p className="text-zinc-600 dark:text-zinc-400 mt-2">完全免费、极速、无需数据库的 Git 内容管理方案</p>
+              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                由于网络原因，管理方式已全新升级！
+              </h1>
+              <p className="text-zinc-600 dark:text-zinc-400 mt-2">
+                完全免费、极速、无需数据库的 Git 内容管理方案
+              </p>
             </div>
           </div>
 
@@ -78,34 +92,85 @@ export default function Admin() {
                 <FileJson className="text-blue-400" /> 为什么要这样改？
               </h3>
               <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
-                之前你遇到的 <strong>“图片一直显示处理中”</strong> 以及 <strong>“文字配置一刷新网页就没了”</strong> 的问题，是因为 Firebase 数据库的服务器被国内网络屏障（GFW）阻挡，导致你的浏览器无法成功将数据发送给 Google 的服务器。
+                之前你遇到的 <strong>“图片一直显示处理中”</strong> 以及{" "}
+                <strong>“文字配置一刷新网页就没了”</strong> 的问题，是因为
+                Firebase
+                数据库的服务器被国内网络屏障（GFW）阻挡，导致你的浏览器无法成功将数据发送给
+                Google 的服务器。
               </p>
               <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                为了彻底解决这个问题，并且让你更方便地管理（比如直接使用 GitHub 管理），我帮你去掉了所有复杂的数据库，把网站改造成了 <strong>“Git-based CMS (基于 Git 的静态内容管理)”</strong>。
-                <br /><br />
-                这意味着：你的所有博客、联系方式、图片数据，现在都变成了纯文本的 JSON 文件，直接保存在你的代码仓库里。<strong>Vercel 每次检测到你修改了这些文件，就会自动重新部署一次！</strong> 速度不仅极快，并且国内访问永远不会卡数据库。
+                为了彻底解决这个问题，并且让你更方便地管理（比如直接使用 GitHub
+                管理），我帮你去掉了所有复杂的数据库，把网站改造成了{" "}
+                <strong>“Git-based CMS (基于 Git 的静态内容管理)”</strong>。
+                <br />
+                <br />
+                这意味着：你的所有博客、联系方式、图片数据，现在都变成了纯文本的
+                JSON 文件，直接保存在你的代码仓库里。
+                <strong>
+                  Vercel 每次检测到你修改了这些文件，就会自动重新部署一次！
+                </strong>{" "}
+                速度不仅极快，并且国内访问永远不会卡数据库。
               </p>
             </div>
 
             <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl mb-8">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <Github className="text-zinc-700 dark:text-zinc-300" /> 如何发布新内容 / 修改联系方式？
+                <Github className="text-zinc-700 dark:text-zinc-300" />{" "}
+                如何发布新内容 / 修改联系方式？
               </h3>
               <ol className="list-decimal pl-5 space-y-4 text-zinc-600 dark:text-zinc-400">
-                <li>打开你的 GitHub 仓库：<code>Yuban18267/-Web</code></li>
-                <li>找到并进入 <strong><code>src/data</code></strong> 文件夹。你会看到以下几个文件：
+                <li>
+                  打开你的 GitHub 仓库：<code>Yuban18267/-Web</code>
+                </li>
+                <li>
+                  找到并进入{" "}
+                  <strong>
+                    <code>src/data</code>
+                  </strong>{" "}
+                  文件夹。你会看到以下几个文件：
                   <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">contacts.json</code> - 管理联系我页面的邮箱、微信、QQ、B站、抖音、小红书等</li>
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">blogs.json</code> - 管理文字博客（支持多图并排）</li>
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">games.json</code> - 管理游戏生涯</li>
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">photos.json</code> - 管理摄影图片</li>
-                    <li><code className="text-sky-400 bg-sky-400/10 px-1 rounded">videos.json</code> - 管理视频</li>
+                    <li>
+                      <code className="text-sky-400 bg-sky-400/10 px-1 rounded">
+                        contacts.json
+                      </code>{" "}
+                      - 管理联系我页面的邮箱、微信、QQ、B站、抖音、小红书等
+                    </li>
+                    <li>
+                      <code className="text-sky-400 bg-sky-400/10 px-1 rounded">
+                        blogs.json
+                      </code>{" "}
+                      - 管理文字博客（支持多图并排）
+                    </li>
+                    <li>
+                      <code className="text-sky-400 bg-sky-400/10 px-1 rounded">
+                        games.json
+                      </code>{" "}
+                      - 管理游戏生涯
+                    </li>
+                    <li>
+                      <code className="text-sky-400 bg-sky-400/10 px-1 rounded">
+                        photos.json
+                      </code>{" "}
+                      - 管理摄影图片
+                    </li>
+                    <li>
+                      <code className="text-sky-400 bg-sky-400/10 px-1 rounded">
+                        videos.json
+                      </code>{" "}
+                      - 管理视频
+                    </li>
                   </ul>
                 </li>
-                <li><strong>点击你想修改的文件</strong>（比如 <code>blogs.json</code>），点击右上角的 ✏️ (铅笔图标) 编辑文件。</li>
-                <li>按照里面的 JSON 格式，复制一段 <code>{"{...}"}</code>，修改成你的内容。注意图文结合的使用方法：
+                <li>
+                  <strong>点击你想修改的文件</strong>（比如{" "}
+                  <code>blogs.json</code>），点击右上角的 ✏️ (铅笔图标)
+                  编辑文件。
+                </li>
+                <li>
+                  按照里面的 JSON 格式，复制一段 <code>{"{...}"}</code>
+                  ，修改成你的内容。注意图文结合的使用方法：
                   <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl mt-2 text-xs font-mono overflow-auto border border-slate-200 dark:border-zinc-800">
-{`[
+                    {`[
   {
     "id": "2", // 每次新增一个，把 id 改成不一样的数字
     "title": "今天去看了海",
@@ -120,33 +185,75 @@ export default function Admin() {
 ]`}
                   </div>
                 </li>
-                <li>改完后，点击页面右上角的绿色的 <strong>Commit changes</strong> 按钮保存。</li>
-                <li>Vercel 会自动拉取这些更新，大概等一两分钟，你的线上网站就会自动更新了！</li>
+                <li>
+                  改完后，点击页面右上角的绿色的 <strong>Commit changes</strong>{" "}
+                  按钮保存。
+                </li>
+                <li>
+                  Vercel
+                  会自动拉取这些更新，大概等一两分钟，你的线上网站就会自动更新了！
+                </li>
               </ol>
             </div>
 
             <div className="bg-slate-100 dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <ImageIcon className="text-purple-400" /> 如何上传图片？(已解决被覆盖的问题)
+                <ImageIcon className="text-purple-400" />{" "}
+                如何上传图片？(已解决被覆盖的问题)
               </h3>
               <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
-                由于 AI Studio 会覆盖仓库，<strong>强烈建议把“图片”和“代码”分开存放</strong>，有以下两种免费方案：
+                由于 AI Studio 会覆盖仓库，
+                <strong>强烈建议把“图片”和“代码”分开存放</strong>
+                ，有以下两种免费方案：
               </p>
-              
-              <h4 className="font-bold text-zinc-800 dark:text-zinc-200 mt-6 mb-2">方案一：使用专用的 GitHub 图片仓库（推荐）</h4>
+
+              <h4 className="font-bold text-zinc-800 dark:text-zinc-200 mt-6 mb-2">
+                方案一：使用专用的 GitHub 图片仓库（推荐）
+              </h4>
               <ol className="list-decimal pl-5 space-y-2 text-zinc-600 dark:text-zinc-400">
-                <li>在 GitHub 新建一个专门存放图片的公开仓库（例如命名为 <code>my-images</code>）。</li>
-                <li>把你的照片上传到这个新仓库里。</li>
-                <li>上传后，获取照片的原始链接，在 JSON 文件中填写完整的 URL，例如：<br/>
-                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2 break-all">https://raw.githubusercontent.com/Yuban18267/my-images/main/图片名.jpg</code>
+                <li>
+                  在 GitHub 新建一个专门存放图片的公开仓库（例如命名为{" "}
+                  <code>my-images</code>）。
                 </li>
-                <li>这样你的代码仓库和图片仓库相互独立，再怎么由 AI 升级代码都不会删掉你的图片了！</li>
+                <li>把你的照片上传到这个新仓库里。</li>
+                <li>
+                  上传后，获取照片的原始链接，在 JSON 文件中填写完整的
+                  URL，例如：
+                  <br />
+                  <code className="text-sky-400 bg-sky-400/10 px-2 py-1 rounded inline-block mt-2 break-all">
+                    https://raw.githubusercontent.com/Yuban18267/my-images/main/图片名.jpg
+                  </code>
+                </li>
+                <li>
+                  这样你的代码仓库和图片仓库相互独立，再怎么由 AI
+                  升级代码都不会删掉你的图片了！
+                </li>
               </ol>
 
-              <h4 className="font-bold text-zinc-800 dark:text-zinc-200 mt-6 mb-2">方案二：使用第三方免费图床</h4>
+              <h4 className="font-bold text-zinc-800 dark:text-zinc-200 mt-6 mb-2">
+                方案二：使用第三方免费图床
+              </h4>
               <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-2">
-                你也可以直接使用专业的图床，例如 <a href="https://imgse.com/" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">路过图床(imgse.com)</a> 或 <a href="https://sm.ms/" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">SM.MS</a>。
-                只需要进入网站，拖入图片，复制得到的图片直链（URL），填入 JSON 文件即可。
+                你也可以直接使用专业的图床，例如{" "}
+                <a
+                  href="https://imgse.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  路过图床(imgse.com)
+                </a>{" "}
+                或{" "}
+                <a
+                  href="https://sm.ms/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  SM.MS
+                </a>
+                。 只需要进入网站，拖入图片，复制得到的图片直链（URL），填入
+                JSON 文件即可。
               </p>
             </div>
 
@@ -154,33 +261,69 @@ export default function Admin() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 💡 常见问题解答
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q1: 设置专门的图片 Git 仓库时，可以设为“私密” (Private) 吗？</h4>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">
+                    Q1: 设置专门的图片 Git 仓库时，可以设为“私密” (Private) 吗？
+                  </h4>
                   <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
-                    <strong>绝对不可以。</strong> 你的个人网站是公开访问的，游客的浏览器需要去读取你的图片。如果是私密仓库，获取 <code>raw.githubusercontent.com</code> 的链接会被认定为无权限读取，全都会加载失败（显示 404）。<strong>请务必将图床仓库设置为 Public。</strong>如果不希望某些私密照片被看见，请不要上传。
+                    <strong>绝对不可以。</strong>{" "}
+                    你的个人网站是公开访问的，游客的浏览器需要去读取你的图片。如果是私密仓库，获取{" "}
+                    <code>raw.githubusercontent.com</code>{" "}
+                    的链接会被认定为无权限读取，全都会加载失败（显示 404）。
+                    <strong>请务必将图床仓库设置为 Public。</strong>
+                    如果不希望某些私密照片被看见，请不要上传。
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q2: Github 空间有多大？上传照片会不够用吗？</h4>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">
+                    Q2: Github 空间有多大？上传照片会不够用吗？
+                  </h4>
                   <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
-                    GitHub 免费账户对于单个仓库也有极强的包容度。虽然没有明确的上限硬指标，但官方建议<strong>单个仓库保持在 1GB ~ 5GB 以下</strong>，单张图片不能超过 100MB。<br/><br/>
-                    对于个人的网页展示，上传几个章节的摄影作品空间是<strong>完全管够的</strong>！但为了你的网站加载速度，强烈建议每次上传前，用压缩工具（例如 <a href="https://tinypng.com/" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">TinyPNG</a>）或者美图秀秀等把每张原图压缩到 <strong>1MB ~ 2MB 以下</strong>。
+                    GitHub
+                    免费账户对于单个仓库也有极强的包容度。虽然没有明确的上限硬指标，但官方建议
+                    <strong>单个仓库保持在 1GB ~ 5GB 以下</strong>
+                    ，单张图片不能超过 100MB。
+                    <br />
+                    <br />
+                    对于个人的网页展示，上传几个章节的摄影作品空间是
+                    <strong>完全管够的</strong>
+                    ！但为了你的网站加载速度，强烈建议每次上传前，用压缩工具（例如{" "}
+                    <a
+                      href="https://tinypng.com/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      TinyPNG
+                    </a>
+                    ）或者美图秀秀等把每张原图压缩到{" "}
+                    <strong>1MB ~ 2MB 以下</strong>。
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">Q3: 页面标题和网页左上角的网页图标 (Favicon) 如何更换？</h4>
+                  <h4 className="font-bold text-zinc-800 dark:text-zinc-200 text-lg mb-2">
+                    Q3: 页面标题和网页左上角的网页图标 (Favicon) 如何更换？
+                  </h4>
                   <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-800">
-                    我已经为你定制并替换了默认图标，换成了带有数字 "11" 且符合整站暗调风格的极简 Logo！同时页面抬头也改成了 "11island personal net"。<br /><br />
-                    如果你未来想自己换别的图标，只需要：在代码仓库中进入 <code>public/</code> 文件夹，删掉原有的 <code>favicon.svg</code> 文件，然后上传一张你自己喜欢的方形图片并将其命名为 <code>favicon.ico</code> 或修改 <code>index.html</code> 里的路径即可。
+                    我已经为你定制并替换了默认图标，换成了带有数字 "11"
+                    且符合整站暗调风格的极简 Logo！同时页面抬头也改成了
+                    "11island personal net"。
+                    <br />
+                    <br />
+                    如果你未来想自己换别的图标，只需要：在代码仓库中进入{" "}
+                    <code>public/</code> 文件夹，删掉原有的{" "}
+                    <code>favicon.svg</code>{" "}
+                    文件，然后上传一张你自己喜欢的方形图片并将其命名为{" "}
+                    <code>favicon.ico</code> 或修改 <code>index.html</code>{" "}
+                    里的路径即可。
                   </p>
                 </div>
               </div>
             </div>
-            
           </div>
         </motion.div>
       </div>
