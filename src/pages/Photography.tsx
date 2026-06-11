@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Camera, ArrowRight, ArrowLeft } from "lucide-react";
 import { getOptimizedImageUrl } from "../lib/utils";
 import ImgCDN from "../components/ImgCDN";
 import CdnSpeedGovernor from "../components/CdnSpeedGovernor";
+import Skeleton from "../components/Skeleton";
 import photosData from "../data/photos.json";
 
 // Type definition based on new structure
@@ -25,6 +26,15 @@ interface PhotoTheme {
 const themes = photosData as PhotoTheme[];
 
 export default function Photography() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="pt-24 pb-32 min-h-screen">
       <motion.div
@@ -48,7 +58,9 @@ export default function Photography() {
         <CdnSpeedGovernor />
       </motion.div>
 
-      {themes.length === 0 ? (
+      {isLoading ? (
+        <Skeleton type="photo-theme" />
+      ) : themes.length === 0 ? (
         <div className="text-center py-20 text-zinc-500 px-6">
           暂无作品。请在 data/photos.json 中添加数据。
         </div>

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getOptimizedImageUrl } from "../lib/utils";
 import ImgCDN from "../components/ImgCDN";
+import Skeleton from "../components/Skeleton";
 import postsData from "../data/blogs.json";
 
 const posts = [...postsData].sort(
@@ -11,6 +12,15 @@ const posts = [...postsData].sort(
 );
 
 export default function Blog() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="pt-24 pb-24 px-6 max-w-4xl mx-auto min-h-screen">
       <motion.div
@@ -27,7 +37,9 @@ export default function Blog() {
         </p>
       </motion.div>
 
-      {posts.length === 0 ? (
+      {isLoading ? (
+        <Skeleton type="blog-list" />
+      ) : posts.length === 0 ? (
         <div className="text-center py-20 text-zinc-500 bg-slate-100 dark:bg-zinc-900/30 rounded-3xl border border-slate-200 dark:border-zinc-800">
           暂无随笔。
         </div>

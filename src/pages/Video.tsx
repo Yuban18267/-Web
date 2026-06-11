@@ -15,6 +15,7 @@ import {
 import { getOptimizedImageUrl } from "../lib/utils";
 import ImgCDN from "../components/ImgCDN";
 import { BilibiliIcon, TiktokIcon } from "../components/Icons";
+import Skeleton from "../components/Skeleton";
 import videosData from "../data/videos.json";
 import gamesData from "../data/games.json";
 
@@ -187,6 +188,7 @@ export default function Video({ defaultCategory = "all" }: VideoProps) {
   const [activeCategory, setActiveCategory] = useState<
     "all" | "travel" | "game"
   >(defaultCategory);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Parse and unify Travel Videos and Gaming Moments
   const travelList = videosData.map((v) => ({
@@ -233,6 +235,11 @@ export default function Video({ defaultCategory = "all" }: VideoProps) {
 
   // Sync selected video if tab or category switches
   useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 550);
+
     if (filteredVideos.length > 0) {
       // Keep selected is within active subset or reset to first
       const isStillAvailable = filteredVideos.some(
@@ -242,7 +249,9 @@ export default function Video({ defaultCategory = "all" }: VideoProps) {
         setSelectedVideo(filteredVideos[0]);
       }
     }
-  }, [activeCategory]);
+
+    return () => clearTimeout(timer);
+  }, [activeCategory, activeTab]);
 
   const bvid = selectedVideo
     ? getBilibiliId(selectedVideo.videoUrl || "")
@@ -354,7 +363,9 @@ export default function Video({ defaultCategory = "all" }: VideoProps) {
             </div>
 
             {/* Empty view check */}
-            {filteredVideos.length === 0 ? (
+            {isLoading ? (
+              <Skeleton type="video-theater" />
+            ) : filteredVideos.length === 0 ? (
               <div className="text-center py-24 text-zinc-400 bg-white dark:bg-zinc-900/30 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm max-w-4xl mx-auto">
                 <Sparkles size={32} className="mx-auto mb-4 text-blue-400/40" />
                 <span>该分类下暂无视频。</span>

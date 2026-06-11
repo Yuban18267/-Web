@@ -1,40 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
   <defs>
     <linearGradient id="blueGradient" x1="10%" y1="10%" x2="90%" y2="90%">
-      <stop offset="0%" stop-color="#1D4ED8" />
+      <stop offset="0%" stop-color="#1E40AF" />
       <stop offset="60%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#60A5FA" />
+      <stop offset="100%" stop-color="#06B6D4" />
     </linearGradient>
-    <filter id="smoothShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#1E3A8A" flood-opacity="0.15" />
+    <filter id="smoothShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.08" />
     </filter>
   </defs>
 
-  <!-- Irregular organic fluid shape representing '屿' (Island/Pebble) -->
-  <path
-    d="M 28 20 C 48 10, 78 15, 85 35 C 92 55, 88 78, 68 88 C 48 98, 20 85, 14 62 C 8 39, 12 25, 28 20 Z"
-    fill="url(#blueGradient)"
+  <!-- Modern minimalist soft white circular base -->
+  <circle
+    cx="50"
+    cy="50"
+    r="42"
+    fill="#FFFFFF"
     filter="url(#smoothShadow)"
   />
 
-  <!-- Layered white organic curve representing abstract dynamic sea waves and the number '11' -->
-  <path
-    d="M 32 45 C 36 32, 44 26, 48 34 C 51 40, 48 64, 48 70"
-    stroke="#FFFFFF"
-    stroke-width="4"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+  <!-- Styled dynamic parallel elements representing "11" (拾壹) -->
+  <rect
+    x="36"
+    y="25"
+    width="9"
+    height="40"
+    rx="4.5"
+    fill="url(#blueGradient)"
+    transform="rotate(-15 40.5 45)"
   />
-  
-  <path
-    d="M 52 41 C 56 28, 64 22, 68 30 C 71 36, 68 60, 68 66"
-    stroke="#FFFFFF"
-    stroke-width="4"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+  <rect
+    x="54"
+    y="32"
+    width="9"
+    height="32"
+    rx="4.5"
+    fill="url(#blueGradient)"
+    transform="rotate(-15 58.5 48)"
   />
-
-  <!-- Delicate floating white splash dot symbolizing optimism and freshness -->
-  <circle cx="76" cy="24" r="3.5" fill="#FFFFFF" />
-  <circle cx="21" cy="74" r="2.5" fill="#FFFFFF" opacity="0.8" />
 </svg>

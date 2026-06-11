@@ -83,9 +83,9 @@ export default function Home() {
             variants={fadeInUp}
             className="max-w-3xl mx-auto"
           >
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-8 leading-tight min-h-[1.2em]">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tight text-theme-text mb-8 leading-tight min-h-[1.2em]">
               你好，我是
-              <span className="text-blue-600 dark:text-blue-500 inline-block min-w-[3em]">
+              <span className="text-accent inline-block min-w-[3em]">
                 {displayText}
                 <span className="animate-pulse">|</span>
               </span>
@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* Photography Carousel Section */}
-      <section className="py-24 bg-slate-100 dark:bg-zinc-900/30 px-6">
+      <section className="py-24 bg-theme-card/50 border-y border-theme-border/40 backdrop-blur-xs px-6">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -108,14 +108,14 @@ export default function Home() {
         >
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <Camera className="text-zinc-700 dark:text-zinc-300" size={28} />
-              <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              <Camera className="text-accent" size={28} />
+              <h2 className="text-3xl font-black text-theme-text tracking-tight">
                 摄影作品
               </h2>
             </div>
             <Link
               to="/photography"
-              className="flex items-center text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:text-zinc-100 transition-colors group"
+              className="flex items-center text-sm font-medium text-theme-muted hover:text-accent transition-colors group"
             >
               查看全部{" "}
               <ArrowRight
@@ -127,7 +127,7 @@ export default function Home() {
 
           <Link
             to="/photography"
-            className="block relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 aspect-[16/9] md:aspect-[21/9] group shadow-2xl border border-slate-200 dark:border-zinc-800"
+            className="block relative rounded-2xl overflow-hidden bg-theme-bg aspect-[16/9] md:aspect-[21/9] group shadow-2xl border border-theme-border"
           >
             <motion.div
               key={currentImage}
@@ -179,8 +179,8 @@ export default function Home() {
       </section>
 
       {/* Video & Blog Section */}
-      <section className="py-24 bg-white dark:bg-zinc-950 px-6">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
+      <section className="py-24 bg-transparent px-6 relative z-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           {/* Video Section */}
           <motion.div
             initial="hidden"
@@ -193,14 +193,14 @@ export default function Home() {
                 variants={fadeInUp}
                 className="flex items-center gap-3"
               >
-                <Video className="text-zinc-700 dark:text-zinc-300" size={24} />
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                <Video className="text-accent" size={24} />
+                <h2 className="text-2xl font-black text-theme-text tracking-tight animate-pulse">
                   视频记录
                 </h2>
               </motion.div>
               <Link
                 to="/video"
-                className="flex items-center text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:text-zinc-100 transition-colors group"
+                className="flex items-center text-sm font-medium text-theme-muted hover:text-accent transition-colors group"
               >
                 查看全部{" "}
                 <ArrowRight
@@ -218,7 +218,7 @@ export default function Home() {
                     className="block group cursor-pointer"
                   >
                     <motion.div variants={fadeInUp}>
-                      <div className="aspect-video bg-slate-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative mb-4 shadow-lg border border-slate-200 dark:border-zinc-800">
+                      <div className="aspect-video bg-theme-bg rounded-2xl overflow-hidden relative mb-4 shadow-lg border border-theme-border">
                         <ImgCDN
                           src={video.url}
                           alt={video.title}
@@ -226,15 +226,15 @@ export default function Home() {
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors duration-500">
-                          <div className="w-14 h-14 bg-slate-100 dark:bg-zinc-900/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
-                            <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-zinc-100 border-b-[8px] border-b-transparent ml-1"></div>
+                          <div className="w-14 h-14 bg-theme-card/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 border border-theme-border">
+                            <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-accent border-b-[8px] border-b-transparent ml-1"></div>
                           </div>
                         </div>
                       </div>
-                      <h3 className="font-bold text-xl text-zinc-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
+                      <h3 className="font-bold text-xl text-theme-text group-hover:text-accent transition-colors lines-clamp-1">
                         {video.title}
                       </h3>
-                      <p className="text-zinc-500 text-sm mt-2">
+                      <p className="text-theme-muted text-sm mt-1.5">
                         {new Date(video.createdAt).toLocaleDateString()} •{" "}
                         {video.duration || "00:00"}
                       </p>
@@ -242,7 +242,7 @@ export default function Home() {
                   </Link>
                 ))
               ) : (
-                <div className="py-10 text-center text-zinc-600 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
+                <div className="py-10 text-center text-theme-muted border border-dashed border-theme-border rounded-2xl bg-theme-card/30">
                   暂无视频
                 </div>
               )}
@@ -262,16 +262,16 @@ export default function Home() {
                 className="flex items-center gap-3"
               >
                 <BookOpen
-                  className="text-zinc-700 dark:text-zinc-300"
+                  className="text-accent"
                   size={24}
                 />
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                <h2 className="text-2xl font-black text-theme-text tracking-tight animate-pulse">
                   文字博客
                 </h2>
               </motion.div>
               <Link
                 to="/blog"
-                className="flex items-center text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:text-zinc-100 transition-colors group"
+                className="flex items-center text-sm font-medium text-theme-muted hover:text-accent transition-colors group"
               >
                 查看全部{" "}
                 <ArrowRight
@@ -286,25 +286,25 @@ export default function Home() {
                   <Link to="/blog" key={blog.id} className="block">
                     <motion.div
                       variants={fadeInUp}
-                      className="p-8 bg-slate-100 dark:bg-zinc-900/50 rounded-2xl border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:bg-zinc-900 hover:border-slate-300 dark:border-zinc-700 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+                      className="p-8 bg-theme-card/90 backdrop-blur-xs rounded-2xl border border-theme-border hover:border-theme-border-hover hover:shadow-xs hover:translate-y-[-2px] transition-all duration-300 cursor-pointer group"
                     >
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 font-semibold tracking-wide mb-3 uppercase">
+                      <p className="text-xs text-theme-muted font-bold tracking-wider mb-2 uppercase">
                         {blog.category || "随笔"}
                       </p>
-                      <h3 className="font-bold text-2xl mb-3 text-zinc-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
+                      <h3 className="font-extrabold text-xl mb-3 text-theme-text group-hover:text-accent transition-colors">
                         {blog.title}
                       </h3>
-                      <p className="text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-6 leading-relaxed">
+                      <p className="text-theme-muted text-sm line-clamp-2 mb-4 leading-relaxed">
                         {blog.content}
                       </p>
-                      <span className="text-sm text-zinc-500 font-medium">
+                      <span className="text-xs text-theme-muted opacity-80 font-medium">
                         {new Date(blog.createdAt).toLocaleDateString()}
                       </span>
                     </motion.div>
                   </Link>
                 ))
               ) : (
-                <div className="py-10 text-center text-zinc-600 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
+                <div className="py-10 text-center text-theme-muted border border-dashed border-theme-border rounded-2xl bg-theme-card/30">
                   暂无博客
                 </div>
               )}
