@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { getOptimizedImageUrl } from "../lib/utils";
+import ImgCDN from "../components/ImgCDN";
 import posts from "../data/blogs.json";
 
 export default function BlogDetail() {
@@ -66,8 +67,8 @@ export default function BlogDetail() {
                   key={idx}
                   className="overflow-hidden rounded-2xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800"
                 >
-                  <img
-                    src={getOptimizedImageUrl(img)}
+                  <ImgCDN
+                    src={img}
                     alt={`${post.title} illustration ${idx + 1}`}
                     className="w-full h-auto object-cover"
                     referrerPolicy="no-referrer"

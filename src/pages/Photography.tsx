@@ -2,6 +2,8 @@ import React, { useRef } from "react";
 import { motion } from "motion/react";
 import { Camera, ArrowRight, ArrowLeft } from "lucide-react";
 import { getOptimizedImageUrl } from "../lib/utils";
+import ImgCDN from "../components/ImgCDN";
+import CdnSpeedGovernor from "../components/CdnSpeedGovernor";
 import photosData from "../data/photos.json";
 
 // Type definition based on new structure
@@ -28,19 +30,22 @@ export default function Photography() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-24 text-center px-6 max-w-4xl mx-auto"
+        className="mb-24 text-center px-6 max-w-4xl mx-auto flex flex-col items-center"
       >
-        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 rounded-2xl flex items-center justify-center mx-auto mb-6 -rotate-3">
+        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 rounded-2xl flex items-center justify-center mb-6 -rotate-3">
           <Camera size={32} />
         </div>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-zinc-100 mb-6 tracking-tighter">
           光影画廊
         </h1>
-        <p className="text-zinc-500 dark:text-zinc-400 text-lg md:text-xl font-serif">
+        <p className="text-zinc-500 dark:text-zinc-400 text-lg md:text-xl font-serif mb-8">
           以主题为名，用镜头语言讲述不同维度的故事。
           <br className="hidden md:block" />
           横向滑动，即可浏览完整的画卷。
         </p>
+
+        {/* Network speed governor widget centered under introduction */}
+        <CdnSpeedGovernor />
       </motion.div>
 
       {themes.length === 0 ? (
@@ -58,7 +63,14 @@ export default function Photography() {
   );
 }
 
-function ThemeGallery({ theme, index }: { theme: PhotoTheme; index: number }) {
+function ThemeGallery({
+  theme,
+  index,
+}: {
+  theme: PhotoTheme;
+  index: number;
+  key?: React.Key;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
@@ -134,8 +146,8 @@ function ThemeGallery({ theme, index }: { theme: PhotoTheme; index: number }) {
               className="snap-center shrink-0 flex flex-col w-[85vw] md:w-[60vw] lg:w-[45vw]"
             >
               <div className="overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 relative aspect-[4/3] md:aspect-[3/2] shadow-xl border border-zinc-200/50 dark:border-zinc-800/50 group/img">
-                <img
-                  src={getOptimizedImageUrl(photo.url)}
+                <ImgCDN
+                  src={photo.url}
                   alt={photo.title || theme.title}
                   className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 ease-out"
                   referrerPolicy="no-referrer"

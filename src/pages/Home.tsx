@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getOptimizedImageUrl } from "../lib/utils";
+import ImgCDN from "../components/ImgCDN";
 import photosData from "../data/photos.json";
 import videosData from "../data/videos.json";
 import blogsData from "../data/blogs.json";
@@ -128,16 +129,20 @@ export default function Home() {
             to="/photography"
             className="block relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 aspect-[16/9] md:aspect-[21/9] group shadow-2xl border border-slate-200 dark:border-zinc-800"
           >
-            <motion.img
+            <motion.div
               key={currentImage}
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              src={getOptimizedImageUrl(displayPhotos[currentImage]?.url)}
-              alt="Photography"
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-              referrerPolicy="no-referrer"
-            />
+              className="w-full h-full"
+            >
+              <ImgCDN
+                src={displayPhotos[currentImage]?.url || ""}
+                alt="Photography"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
 
             {displayPhotos.length > 1 && (
               <>
@@ -214,8 +219,8 @@ export default function Home() {
                   >
                     <motion.div variants={fadeInUp}>
                       <div className="aspect-video bg-slate-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative mb-4 shadow-lg border border-slate-200 dark:border-zinc-800">
-                        <img
-                          src={getOptimizedImageUrl(video.url)}
+                        <ImgCDN
+                          src={video.url}
                           alt={video.title}
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
                           referrerPolicy="no-referrer"

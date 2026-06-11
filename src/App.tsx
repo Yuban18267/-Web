@@ -28,11 +28,10 @@ import Photography from "./pages/Photography";
 import Video from "./pages/Video";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
-import Game from "./pages/Game";
-import GameDetail from "./pages/GameDetail";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import { useTheme } from "./hooks/useTheme";
+import Logo from "./components/Logo";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -107,7 +106,7 @@ function AppRoutes() {
           path="/game"
           element={
             <PageTransition>
-              <Game />
+              <Video defaultCategory="game" />
             </PageTransition>
           }
         />
@@ -115,7 +114,7 @@ function AppRoutes() {
           path="/game/:id"
           element={
             <PageTransition>
-              <GameDetail />
+              <Video defaultCategory="game" />
             </PageTransition>
           }
         />
@@ -146,9 +145,8 @@ export default function App() {
   const navLinks = [
     { to: "/", label: "主页", icon: <HomeIcon size={20} /> },
     { to: "/photography", label: "摄影作品", icon: <Camera size={20} /> },
-    { to: "/video", label: "旅行视频", icon: <VideoIcon size={20} /> },
+    { to: "/video", label: "视频记录", icon: <VideoIcon size={20} /> },
     { to: "/blog", label: "个人随笔", icon: <BookOpen size={20} /> },
-    { to: "/game", label: "游戏生涯", icon: <Gamepad2 size={20} /> },
   ];
 
   const staggerContainer = {
@@ -187,9 +185,11 @@ export default function App() {
               </button>
               <Link
                 to="/"
-                className="text-xl font-bold tracking-tighter text-blue-600 dark:text-zinc-100 hover:text-blue-700 dark:hover:text-zinc-300 transition-colors"
+                className="flex items-center gap-2 text-xl font-bold tracking-tighter text-blue-600 dark:text-zinc-100 hover:text-blue-700 dark:hover:text-zinc-300 transition-colors"
+                id="brand-header-logo-link"
               >
-                拾壹屿
+                <Logo size={28} />
+                <span>拾壹屿</span>
               </Link>
             </div>
 
@@ -211,12 +211,6 @@ export default function App() {
                 className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors"
               >
                 博客
-              </Link>
-              <Link
-                to="/game"
-                className="hover:text-blue-600 dark:hover:text-zinc-100 transition-colors"
-              >
-                游戏
               </Link>
               <ThemeToggle />
               <Link
@@ -248,9 +242,10 @@ export default function App() {
                 className="fixed top-0 left-0 bottom-0 w-80 bg-white dark:bg-zinc-900 z-[70] p-8 shadow-2xl border-r border-slate-200 dark:border-zinc-800 flex flex-col"
               >
                 <div className="flex items-center justify-between mb-12">
-                  <span className="text-2xl font-bold tracking-tighter text-slate-800 dark:text-zinc-100">
-                    拾壹屿
-                  </span>
+                  <div className="flex items-center gap-2 font-bold tracking-tighter text-2xl text-slate-800 dark:text-zinc-100">
+                    <Logo size={28} />
+                    <span>拾壹屿</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <ThemeToggle />
                     <button
@@ -324,10 +319,11 @@ export default function App() {
 
         {/* Footer */}
         <footer className="py-16 px-6 bg-slate-100 dark:bg-zinc-950 border-t border-slate-200 dark:border-zinc-800 text-center transition-colors duration-300">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold mb-3 text-slate-800 dark:text-zinc-100">
-              拾壹屿
-            </h2>
+          <div className="max-w-5xl mx-auto flex flex-col items-center">
+            <div className="flex items-center justify-center gap-2.5 mb-3 font-bold text-3xl text-slate-800 dark:text-zinc-100 hover:scale-105 transition-transform duration-300">
+              <Logo size={32} />
+              <span>拾壹屿</span>
+            </div>
             <p className="text-slate-500 dark:text-zinc-500 italic mb-10 text-lg">
               永远相信美好的事情即将发生！
             </p>
