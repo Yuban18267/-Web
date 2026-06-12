@@ -20,6 +20,7 @@ import {
   Moon,
   Monitor,
   Palette,
+  Terminal,
 } from "lucide-react";
 import { QQIcon, BilibiliIcon, TiktokIcon } from "./components/Icons";
 import React, { useEffect, useState } from "react";
@@ -32,6 +33,7 @@ import BlogDetail from "./pages/BlogDetail";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Personalization from "./pages/Personalization";
+import Tools from "./pages/Tools";
 import BackgroundOverlay from "./components/BackgroundOverlay";
 import MikuWidget from "./components/MikuWidget";
 import { useTheme } from "./hooks/useTheme";
@@ -115,6 +117,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/tools"
+          element={
+            <PageTransition>
+              <Tools />
+            </PageTransition>
+          }
+        />
+        <Route
           path="/game"
           element={
             <PageTransition>
@@ -160,6 +170,7 @@ export default function App() {
     { to: "/video", label: "视频记录", icon: <VideoIcon size={20} /> },
     { to: "/blog", label: "个人随笔", icon: <BookOpen size={20} /> },
     { to: "/personalization", label: "个性化", icon: <Palette size={20} /> },
+    { to: "/tools", label: "网页工具", icon: <Terminal size={20} /> },
   ];
 
   const staggerContainer = {
@@ -232,6 +243,12 @@ export default function App() {
                 className="hover:text-accent transition-colors"
               >
                 个性化
+              </Link>
+              <Link
+                to="/tools"
+                className="hover:text-accent transition-colors"
+              >
+                工具
               </Link>
               <ThemeToggle />
               <Link

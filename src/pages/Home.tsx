@@ -7,6 +7,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  Wrench,
+  Terminal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getOptimizedImageUrl } from "../lib/utils";
@@ -311,6 +313,122 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Web Tools Subsection at the bottom */}
+      <section className="py-24 bg-theme-card/30 border-t border-theme-border/40 backdrop-blur-xs px-6">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInUp}
+          className="max-w-5xl mx-auto"
+        >
+          <div className="flex items-center justify-between mb-12">
+            <div className="flex items-center gap-3">
+              <Wrench className="text-accent" size={26} />
+              <h2 className="text-3xl font-black text-theme-text tracking-tight">
+                网页专属工具集
+              </h2>
+            </div>
+            <Link
+              to="/tools"
+              className="flex items-center text-sm font-medium text-theme-muted hover:text-accent transition-colors group"
+            >
+              进入工具频道{" "}
+              <ArrowRight
+                size={16}
+                className="ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Main spotlight tool item */}
+            <div className="md:col-span-2 p-8 bg-theme-card border border-theme-border rounded-3xl hover:border-accent/40 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold bg-accent/15 text-accent px-2.5 py-0.5 rounded-full">
+                    Advanced Tool // 精密物理网卡及显卡感知
+                  </span>
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <h3 className="text-2xl font-black text-theme-text mb-3 group-hover:text-accent transition-colors">
+                  系统硬件与环境监视器
+                </h3>
+                <p className="text-theme-muted text-sm leading-relaxed mb-6">
+                  利用纯前端沙箱机制，实时提取包括物理 GPU 渲染芯片、逻辑 CPU 核心负载波动、色深和 DPR、以及电池电量和即时 Cloudflare CDN 传输延时在内的硬核环境参数。
+                </p>
+                
+                {/* Visual spec representations (Bento mockup preview) */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-3 bg-theme-bg border border-theme-border rounded-xl text-center">
+                    <p className="text-[9px] text-theme-muted font-mono uppercase mb-0.5">CPU Hardware</p>
+                    <span className="text-xs font-mono font-bold text-theme-text">Multi-Core Info</span>
+                  </div>
+                  <div className="p-3 bg-theme-bg border border-theme-border rounded-xl text-center">
+                    <p className="text-[9px] text-theme-muted font-mono uppercase mb-0.5">Graphics Engine</p>
+                    <span className="text-xs font-mono font-bold text-theme-text">GPU Renderer</span>
+                  </div>
+                  <div className="p-3 bg-theme-bg border border-theme-border rounded-xl text-center">
+                    <p className="text-[9px] text-theme-muted font-mono uppercase mb-0.5">Battery Monitor</p>
+                    <span className="text-xs font-mono font-bold text-theme-text">Power Status</span>
+                  </div>
+                  <div className="p-3 bg-theme-bg border border-theme-border rounded-xl text-center">
+                    <p className="text-[9px] text-theme-muted font-mono uppercase mb-0.5">Network Core</p>
+                    <span className="text-xs font-mono font-bold text-theme-text">Ping Diagnostics</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-between items-center border-t border-theme-border/50 pt-4">
+                <span className="text-[11px] text-theme-muted font-mono flex items-center gap-1.5">
+                  <Terminal size={11} className="text-accent" />
+                  前端只读安全调用 • 无后台隐私泄露
+                </span>
+                <Link
+                  to="/tools"
+                  className="px-5 py-2 bg-accent text-white dark:text-zinc-900 font-bold rounded-xl text-xs hover:opacity-90 shadow-sm transition-opacity"
+                >
+                  立即体验
+                </Link>
+              </div>
+            </div>
+
+            {/* Side teaser items */}
+            <div className="flex flex-col gap-6">
+              <div className="p-6 bg-theme-card/60 border border-theme-border rounded-2.5xl flex flex-col justify-between flex-1 hover:border-theme-border-hover transition-colors">
+                <div>
+                  <span className="text-[9px] uppercase font-mono tracking-wider font-bold text-theme-muted">
+                    Upcoming Gadget #02
+                  </span>
+                  <h4 className="text-lg font-bold text-theme-text mt-2 mb-1.5">
+                    开发者代码格式化沙盒
+                  </h4>
+                  <p className="text-theme-muted text-xs leading-relaxed">
+                    提供极速、无广告的本地代码着色、压缩及格式化处理。
+                  </p>
+                </div>
+                <span className="text-[10px] text-theme-muted font-mono mt-4 block">规划研发中...</span>
+              </div>
+
+              <div className="p-6 bg-theme-card/60 border border-theme-border rounded-2.5xl flex flex-col justify-between flex-1 hover:border-theme-border-hover transition-colors">
+                <div>
+                  <span className="text-[9px] uppercase font-mono tracking-wider font-bold text-theme-muted">
+                    Upcoming Gadget #03
+                  </span>
+                  <h4 className="text-lg font-bold text-theme-text mt-2 mb-1.5">
+                    像素级别图片裁剪转换
+                  </h4>
+                  <p className="text-theme-muted text-xs leading-relaxed">
+                    纯本地 WebAssembly 强力无失真压制，保护您的照片数据安全。
+                  </p>
+                </div>
+                <span className="text-[10px] text-theme-muted font-mono mt-4 block">规划研发中...</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </section>
     </>
   );
