@@ -507,9 +507,10 @@ export default function Tools() {
 
       {/* COMPARTMENT 1: Dynamic UA & Terminal Detection */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1, duration: 0.5 }}
+        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ type: "spring", stiffness: 75, damping: 15, mass: 0.65 }}
         className="mb-8 p-6 rounded-3xl bg-theme-bg border border-theme-border flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent pointer-events-none" />
@@ -544,9 +545,10 @@ export default function Tools() {
         
         {/* Real Live Internet & Connection Diagnostic Card */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          initial={{ opacity: 0, y: 35, scale: 0.97 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ type: "spring", stiffness: 72, damping: 14, mass: 0.65, delay: 0.05 }}
           className="lg:col-span-2 p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/35 transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-accent/2 rounded-full blur-3xl pointer-events-none group-hover:bg-accent/5 transition-all" />
@@ -680,9 +682,10 @@ export default function Tools() {
 
         {/* Database Match Status Widget */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 35, scale: 0.97 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ type: "spring", stiffness: 72, damping: 14, mass: 0.65, delay: 0.12 }}
           className="p-6 rounded-3xl bg-gradient-to-br from-accent/5 to-cyan-500/5 border border-theme-border flex flex-col justify-between hover:border-cyan-500/30 transition-colors"
         >
           <div>
@@ -732,9 +735,10 @@ export default function Tools() {
         
         {/* GPU Video Core Grid Item */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/3 rounded-full blur-2xl group-hover:bg-pink-500/8 transition-colors pointer-events-none" />
@@ -796,9 +800,10 @@ export default function Tools() {
 
         {/* CPU Logical Core Grid Item */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7, delay: 0.08 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-400/5 rounded-full blur-2xl group-hover:bg-cyan-400/10 transition-all pointer-events-none" />
@@ -877,9 +882,10 @@ export default function Tools() {
 
         {/* Display and Optics Canvas Grid Item */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7, delay: 0.16 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div>
@@ -941,9 +947,10 @@ export default function Tools() {
 
         {/* Browser Sandbox privacy & anti-fingerprinting integrity check */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-105px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/3 rounded-full blur-2xl group-hover:bg-emerald-500/8 transition-colors pointer-events-none" />
@@ -1009,9 +1016,10 @@ export default function Tools() {
 
         {/* Battery Power Grid Item */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-105px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7, delay: 0.08 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/3 rounded-full blur-2xl group-hover:bg-blue-500/8 transition-colors pointer-events-none" />
@@ -1073,9 +1081,10 @@ export default function Tools() {
 
         {/* Global Sandbox / Memory Heap Details */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-105px" }}
+          transition={{ type: "spring", stiffness: 68, damping: 14, mass: 0.7, delay: 0.16 }}
           className="p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col justify-between hover:border-accent/40 hover:shadow-sm transition-all group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/3 rounded-full blur-2xl group-hover:bg-purple-500/8 transition-colors pointer-events-none" />

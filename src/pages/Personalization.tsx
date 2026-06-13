@@ -155,8 +155,8 @@ export default function Personalization() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-14 text-center max-w-4xl mx-auto mt-4"
       >
-        <div className="w-16 h-16 bg-accent-light text-accent rounded-3xl flex items-center justify-center mb-6 mx-auto rotate-6 shadow-sm border border-theme-border">
-          <Palette size={32} />
+        <div className="w-16 h-16 bg-accent-light/10 text-accent rounded-3xl flex items-center justify-center mb-6 mx-auto rotate-6 shadow-sm border border-accent/15 transition-transform duration-300 hover:rotate-12">
+          <Palette size={28} />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-theme-text tracking-tighter mb-4">
           拾壹美学系统

@@ -265,8 +265,8 @@ export default function Video({ defaultCategory = "all" }: VideoProps) {
         animate={{ opacity: 1, y: 0 }}
         className="mb-14 flex flex-col items-center text-center"
       >
-        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-3xl flex items-center justify-center mb-5 rotate-3 shadow-md border border-blue-100/50 dark:border-blue-900/30">
-          <VideoIcon size={30} />
+        <div className="w-16 h-16 bg-pink-500/10 text-pink-500 rounded-3xl flex items-center justify-center mb-6 rotate-3 border border-pink-500/15 shadow-sm transition-transform duration-300 hover:rotate-6">
+          <VideoIcon size={28} />
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-zinc-950 dark:text-zinc-50 mb-4 tracking-tight">
           极目观澜

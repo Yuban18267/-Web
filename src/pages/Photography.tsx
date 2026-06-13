@@ -166,8 +166,8 @@ export default function Photography() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-16 text-center px-6 max-w-4xl mx-auto flex flex-col items-center"
       >
-        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 rounded-2xl flex items-center justify-center mb-6 -rotate-3 border border-zinc-200/40 dark:border-zinc-800/40">
-          <Camera size={32} />
+        <div className="w-16 h-16 bg-accent-light/10 text-accent rounded-3xl flex items-center justify-center mb-6 -rotate-3 border border-accent/15 shadow-sm transition-transform duration-300 hover:rotate-3">
+          <Camera size={28} />
         </div>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-zinc-100 mb-6 tracking-tighter">
           光影画廊

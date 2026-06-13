@@ -22,6 +22,7 @@ import {
   Palette,
   Terminal,
   Info,
+  Sparkles,
 } from "lucide-react";
 import { QQIcon, BilibiliIcon, TiktokIcon } from "./components/Icons";
 import React, { useEffect, useState } from "react";
@@ -35,6 +36,7 @@ import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Personalization from "./pages/Personalization";
 import Tools from "./pages/Tools";
+import ZenFocus from "./pages/ZenFocus";
 import About from "./pages/About";
 import BackgroundOverlay from "./components/BackgroundOverlay";
 import MikuWidget from "./components/MikuWidget";
@@ -127,6 +129,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/focus"
+          element={
+            <PageTransition>
+              <ZenFocus />
+            </PageTransition>
+          }
+        />
+        <Route
           path="/about"
           element={
             <PageTransition>
@@ -179,6 +189,7 @@ export default function App() {
     { to: "/photography", label: "摄影作品", icon: <Camera size={20} /> },
     { to: "/video", label: "视频记录", icon: <VideoIcon size={20} /> },
     { to: "/blog", label: "个人随笔", icon: <BookOpen size={20} /> },
+    { to: "/focus", label: "律动自修室", icon: <Sparkles size={20} /> },
     { to: "/personalization", label: "个性化", icon: <Palette size={20} /> },
     { to: "/tools", label: "网页工具", icon: <Terminal size={20} /> },
     { to: "/about", label: "关于本站", icon: <Info size={20} /> },
@@ -322,11 +333,11 @@ export default function App() {
                       <Link
                         to={link.to}
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-accent-light text-theme-muted hover:text-accent transition-all group"
+                        className="flex items-center gap-4 py-2 px-3 rounded-2xl hover:bg-accent-light text-theme-muted hover:text-accent transition-all group"
                       >
-                        <span className="text-theme-muted/60 group-hover:text-accent transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-accent-light/10 text-theme-muted group-hover:text-accent group-hover:bg-accent/10 flex items-center justify-center border border-theme-border/50 group-hover:border-accent/15 transition-all">
                           {link.icon}
-                        </span>
+                        </div>
                         <span className="font-bold text-lg">{link.label}</span>
                       </Link>
                     </motion.div>

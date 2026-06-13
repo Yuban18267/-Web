@@ -11,6 +11,7 @@ import {
   Calendar,
   Clock,
 } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
 
 // Standard professional bezier dynamics for fluid non-linear animation
 const containerVariants = {
@@ -48,6 +49,9 @@ interface ChangelogItem {
 }
 
 export default function About() {
+  const { theme } = useTheme();
+  const isLight = theme === "light" || theme === "sakura" || theme === "forest";
+
   // Real-time calculation since standard baseline station launch (2026-03-20 to current)
   const launchDate = new Date("2026-03-20");
   const currentDate = new Date();
@@ -57,6 +61,14 @@ export default function About() {
   );
 
   const changelog: ChangelogItem[] = [
+    {
+      version: "v1.1.2",
+      date: "2026-06-13",
+      title: "律动自习室正式上线",
+      description:
+        "100% 极速重构 Web Audio 自然合鸣音频回路，修复‘空谷鸟啼’声色通道的增益混音连接；深度集成 12 枚游戏化修心勋章，上线本地无损 MP3/WAV 私人伴读唱片定制与高细分五阶 Notch 音量挡位；完美调校轻量流体体系在亮色背景模式下的色彩高对比排布，拒绝任何色调割裂。",
+      tags: ["鸟啼修复", "12枚修行勋章", "伴读定制", "亮色对比调优"],
+    },
     {
       version: "v1.1.1",
       date: "2026-06-13",
@@ -68,7 +80,7 @@ export default function About() {
     {
       version: "v1.1.0",
       date: "2026-06-12",
-      title: "拾壹屿空间正式惊喜上线",
+      title: "拾壹屿网站正式开放上线",
       description:
         "「拾壹屿」首个正式发行的里程碑大版本。整站功能首发上线，深度集成了高感度系统硬件监视、静谧个人日记随笔、多维个性化配置中心、沉浸式摄影与流媒体纯前端播放底座。轻量灵巧，干净无垢。",
       tags: ["正式上线", "功能大礼包", "全新版本"],
@@ -129,7 +141,8 @@ export default function About() {
       <motion.div
         variants={containerVariants}
         initial="hidden"
-        animate="visible"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-60px" }}
         className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
       >
         {/* Card 1: Intent 设计初衷 */}
@@ -207,41 +220,45 @@ export default function About() {
         {/* Left Intro Card on Self-Developed Engine */}
         <motion.div
           variants={cardVariants}
-          className="p-8 rounded-3.5xl bg-slate-950 dark:bg-black text-slate-100 border border-slate-800 lg:col-span-1 flex flex-col justify-between relative overflow-hidden"
+          className={`p-8 rounded-3.5xl lg:col-span-1 flex flex-col justify-between relative overflow-hidden transition-all duration-300 border ${
+            isLight
+              ? "bg-slate-50 border-slate-200/80 text-slate-900"
+              : "bg-slate-950 dark:bg-black border-slate-800 text-slate-100"
+          }`}
         >
-          <div className="absolute inset-0 bg-gradient-to-tr from-accent/15 to-transparent pointer-events-none" />
+          <div className={`absolute inset-0 bg-gradient-to-tr from-accent/10 to-transparent pointer-events-none ${isLight ? "opacity-40" : "opacity-100"}`} />
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <span className="text-[10px] font-mono tracking-widest text-accent bg-accent/20 px-2.5 py-1 rounded-full font-bold uppercase">
+              <span className="text-[10px] font-mono tracking-widest text-accent bg-accent/15 px-2.5 py-1 rounded-full font-bold uppercase border border-accent/10">
                 ENGINE CORE SPEC
               </span>
             </div>
             <h3 className="text-2xl font-black tracking-tight mb-4">
               “拾壹无重力”流体渲染体系
             </h3>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6 font-sans">
+            <p className={`text-sm leading-relaxed mb-6 font-sans ${isLight ? "text-slate-600" : "text-slate-400"}`}>
               为了实现毫无卡顿、优雅轻盈的视画交互，拾壹屿内置了一整套极轻量的前端无重力渲染核心。
             </p>
-            <div className="space-y-3 font-mono text-[11px] text-slate-300">
-              <div className="flex justify-between items-center py-2 border-b border-slate-850">
+            <div className="space-y-3 font-mono text-[11px]">
+              <div className={`flex justify-between items-center py-2 border-b ${isLight ? "border-slate-200/60 text-slate-700" : "border-slate-800/40 text-slate-300"}`}>
                 <span>物理学底层:</span>
                 <span className="text-accent font-bold">弹簧共振公式</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-850">
+              <div className={`flex justify-between items-center py-2 border-b ${isLight ? "border-slate-200/60 text-slate-700" : "border-slate-800/40 text-slate-300"}`}>
                 <span>渲染阻塞:</span>
                 <span className="text-emerald-500 font-bold">极微毫秒零阻塞</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-850">
+              <div className={`flex justify-between items-center py-2 border-b ${isLight ? "border-slate-200/60 text-slate-700" : "border-slate-800/40 text-slate-300"}`}>
                 <span>像素比规整率:</span>
                 <span className="text-cyan-400 font-bold">高视网膜对齐</span>
               </div>
-              <div className="flex justify-between items-center py-2">
+              <div className={`flex justify-between items-center py-2 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
                 <span>防重流失真:</span>
                 <span className="text-amber-400 font-bold">自适应防抖节流</span>
               </div>
             </div>
           </div>
-          <div className="mt-8 text-[10px] text-slate-500 font-mono">
+          <div className={`mt-8 text-[10px] font-mono ${isLight ? "text-slate-400" : "text-slate-500"}`}>
             BUILD SYSTEM: VITE BINDINGS
           </div>
         </motion.div>

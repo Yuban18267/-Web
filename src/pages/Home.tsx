@@ -109,8 +109,10 @@ export default function Home() {
           className="max-w-5xl mx-auto"
         >
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <Camera className="text-accent" size={28} />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-accent-light/10 text-accent flex items-center justify-center border border-accent/15 shrink-0 shadow-sm transition-transform duration-300 hover:rotate-3">
+                <Camera size={22} className="text-accent" />
+              </div>
               <h2 className="text-3xl font-black text-theme-text tracking-tight">
                 摄影作品
               </h2>
@@ -193,10 +195,12 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <motion.div
                 variants={fadeInUp}
-                className="flex items-center gap-3"
+                className="flex items-center gap-4"
               >
-                <Video className="text-accent" size={24} />
-                <h2 className="text-2xl font-black text-theme-text tracking-tight animate-pulse">
+                <div className="w-12 h-12 rounded-2xl bg-pink-500/10 text-pink-500 flex items-center justify-center border border-pink-500/15 shrink-0 shadow-sm transition-transform duration-300 hover:rotate-3">
+                  <Video size={20} className="text-pink-500" />
+                </div>
+                <h2 className="text-2xl font-black text-theme-text tracking-tight">
                   视频记录
                 </h2>
               </motion.div>
@@ -261,13 +265,12 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <motion.div
                 variants={fadeInUp}
-                className="flex items-center gap-3"
+                className="flex items-center gap-4"
               >
-                <BookOpen
-                  className="text-accent"
-                  size={24}
-                />
-                <h2 className="text-2xl font-black text-theme-text tracking-tight animate-pulse">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/15 shrink-0 shadow-sm transition-transform duration-300 hover:rotate-3">
+                  <BookOpen className="text-emerald-500" size={20} />
+                </div>
+                <h2 className="text-2xl font-black text-theme-text tracking-tight">
                   文字博客
                 </h2>
               </motion.div>
@@ -325,8 +328,10 @@ export default function Home() {
           className="max-w-5xl mx-auto"
         >
           <div className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-3">
-              <Wrench className="text-accent" size={26} />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/15 shrink-0 shadow-sm transition-transform duration-300 hover:rotate-3">
+                <Wrench className="text-blue-500" size={20} />
+              </div>
               <h2 className="text-3xl font-black text-theme-text tracking-tight">
                 网页专属工具集
               </h2>
@@ -397,20 +402,22 @@ export default function Home() {
 
             {/* Side teaser items */}
             <div className="flex flex-col gap-6">
-              <div className="p-6 bg-theme-card/60 border border-theme-border rounded-2.5xl flex flex-col justify-between flex-1 hover:border-theme-border-hover transition-colors">
+              <Link to="/focus" className="p-6 bg-theme-card/60 border border-theme-border rounded-2.5xl flex flex-col justify-between flex-1 hover:border-accent/30 hover:bg-theme-bg/60 transition-all group">
                 <div>
-                  <span className="text-[9px] uppercase font-mono tracking-wider font-bold text-theme-muted">
-                    Upcoming Gadget #02
+                  <span className="text-[9px] uppercase font-mono tracking-wider font-bold text-accent">
+                    New Launch // 禅意随身工坊
                   </span>
-                  <h4 className="text-lg font-bold text-theme-text mt-2 mb-1.5">
-                    开发者代码格式化沙盒
+                  <h4 className="text-lg font-black text-theme-text mt-2 mb-1.5 group-hover:text-accent transition-colors">
+                    自修室 & 音频谱律动舱
                   </h4>
                   <p className="text-theme-muted text-xs leading-relaxed">
-                    提供极速、无广告的本地代码着色、压缩及格式化处理。
+                    内置无损高斯白噪音、极空合成音乐并支持本地音轨上传。通过高阶阻尼物理算法绘制四大唯美律动美学。
                   </p>
                 </div>
-                <span className="text-[10px] text-theme-muted font-mono mt-4 block">规划研发中...</span>
-              </div>
+                <span className="text-[10px] text-accent font-bold font-mono mt-4 flex items-center gap-1">
+                  立即启航体验 &rarr;
+                </span>
+              </Link>
 
               <div className="p-6 bg-theme-card/60 border border-theme-border rounded-2.5xl flex flex-col justify-between flex-1 hover:border-theme-border-hover transition-colors">
                 <div>

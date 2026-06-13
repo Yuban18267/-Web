@@ -33,7 +33,9 @@ export default function Blog() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-12 text-center"
       >
-        <BookOpen className="mx-auto text-zinc-500 mb-6" size={48} />
+        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-3xl flex items-center justify-center mb-6 mx-auto -rotate-3 border border-emerald-500/15 shadow-sm transition-transform duration-300 hover:rotate-3">
+          <BookOpen size={28} />
+        </div>
         <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
           个人随笔
         </h1>
