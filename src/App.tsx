@@ -189,7 +189,6 @@ export default function App() {
     { to: "/photography", label: "摄影作品", icon: <Camera size={20} /> },
     { to: "/video", label: "视频记录", icon: <VideoIcon size={20} /> },
     { to: "/blog", label: "个人随笔", icon: <BookOpen size={20} /> },
-    { to: "/focus", label: "律动自修室", icon: <Sparkles size={20} /> },
     { to: "/personalization", label: "个性化", icon: <Palette size={20} /> },
     { to: "/tools", label: "网页工具", icon: <Terminal size={20} /> },
     { to: "/about", label: "关于本站", icon: <Info size={20} /> },
