@@ -771,9 +771,19 @@ export default function ZenFocus() {
       const sEnergy = smoothedEnergyRef.current * 0.86 + energy * 0.14;
       smoothedEnergyRef.current = sEnergy;
 
-      // Read real sizes
-      const width = canvas.width = canvas.getBoundingClientRect().width * window.devicePixelRatio;
-      const height = canvas.height = canvas.getBoundingClientRect().height * window.devicePixelRatio;
+      // Dynamic cached size resolution with DPR clamping for high battery efficiency & 60-120fps smoothness
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      const targetWidth = Math.round(rect.width * dpr);
+      const targetHeight = Math.round(rect.height * dpr);
+
+      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+      }
+
+      const width = canvas.width;
+      const height = canvas.height;
       
       ctx.clearRect(0, 0, width, height);
       const brandColorHex = getComputedStyle(document.documentElement).getPropertyValue("--brand-color").trim() || "#2563eb";

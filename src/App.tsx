@@ -4,6 +4,7 @@ import {
   Route,
   Link,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import {
   Github,
@@ -130,11 +131,7 @@ function AppRoutes() {
         />
         <Route
           path="/focus"
-          element={
-            <PageTransition>
-              <ZenFocus />
-            </PageTransition>
-          }
+          element={<Navigate to="/tools?tool=focus" replace />}
         />
         <Route
           path="/about"
