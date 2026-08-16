@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useSearchParams } from "react-router-dom";
 import ZenFocus from "./ZenFocus";
+import BenchmarkCompare from "./BenchmarkCompare";
 import {
   Cpu,
   Monitor,
@@ -29,6 +30,9 @@ import {
   ShieldCheck,
   Server,
   TrendingUp,
+  Award,
+  Layers,
+  SlidersHorizontal,
 } from "lucide-react";
 
 interface HardwareInfo {
@@ -680,6 +684,14 @@ export default function Tools() {
   const runPingTest = runSpeedTest;
 
   // --- SUB-TOOL REDIRECT DISPATCHER ---
+  if (currentTool === "benchmark") {
+    return (
+      <div className="pt-20">
+        <BenchmarkCompare onBackToTools={() => setSearchParams({ tool: "list" })} />
+      </div>
+    );
+  }
+
   if (currentTool === "focus") {
     return (
       <div className="pt-20">
@@ -699,7 +711,7 @@ export default function Tools() {
 
   if (currentTool === "list") {
     return (
-      <div className="pt-24 pb-32 px-6 max-w-5xl mx-auto min-h-[70vh] flex flex-col justify-center">
+      <div className="pt-24 pb-32 px-6 max-w-6xl mx-auto min-h-[70vh] flex flex-col justify-center">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -715,28 +727,95 @@ export default function Tools() {
             网页效率工具箱
           </h1>
           <p className="text-theme-muted max-w-2xl text-sm md:text-base leading-relaxed">
-            这里是专属于极客与创意者在线工具矩阵。集成了高沉浸度的 Procedural Web Audio 律动白噪音室、物理硬件特征感知矩阵和高频网络吞吐量诊断工具。
+            这里是专属于极客与创意者的在线工具矩阵。集成了 3C 终端性能天梯与规格同屏对决竞技场、Procedural Web Audio 律动自修室以及高精度纯前端物理硬件特征感知矩阵。
           </p>
         </motion.div>
 
         {/* Tools Portal Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           
-          {/* TOOL 1 CARD: 禅意律动自修室 */}
+          {/* TOOL 1 CARD: 3C 终端性能天梯与规格对决 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="w-13 h-13 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/20 shadow-xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                  <Award size={24} />
+                </div>
+                <span className="text-[10px] text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
+                  全品类天梯
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
+                  终端性能天梯
+                </h2>
+                <p className="text-xs text-theme-muted leading-relaxed">
+                  客观收录手机、电脑笔电、平板与智能手表硬件规格与跑分数据。支持 2~4 款终端同屏参数对比与六维战力测算。
+                </p>
+              </div>
+
+              {/* Decorative Benchmark Ladder Preview */}
+              <div className="h-10 w-full flex items-center justify-between px-3 bg-theme-bg/60 rounded-xl border border-theme-border/50 overflow-hidden relative text-[10px] font-mono font-bold">
+                <div className="flex items-center gap-1.5 text-accent">
+                  <Zap size={12} />
+                  <span>GB6 单多核</span>
+                </div>
+                <div className="flex items-center gap-1 text-theme-muted">
+                  <span>多机差异 PK</span>
+                </div>
+                <div className="flex items-center gap-1 text-emerald-500">
+                  <span>六维战力</span>
+                </div>
+              </div>
+
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  覆盖 iPhone/华为/小米/Mac/ROG 等主流旗舰
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  SoC制程、屏幕色域、大底传感器、快充全参
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  支持多设备横向滑动表格对比与差异过滤
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => setSearchParams({ tool: "benchmark" })}
+              className="mt-6 w-full py-3 bg-accent hover:opacity-90 text-white dark:text-zinc-900 font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
+            >
+              <span>进入天梯与对决</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </motion.div>
+
+          {/* TOOL 2 CARD: 禅意律动自修室 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-8 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
           >
             {/* Ambient Background Glow on Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Header Icon & Tag */}
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                  <Sparkles size={26} />
+                <div className="w-13 h-13 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <Sparkles size={24} />
                 </div>
                 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
                   沉浸式专注
@@ -745,69 +824,65 @@ export default function Tools() {
 
               {/* Text Meta */}
               <div className="space-y-2">
-                <h2 className="text-xl font-bold text-theme-text group-hover:text-accent transition-colors">
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
                   禅意随身自修室 (Zen Study Space)
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  基于先进 Web Audio API 技术实时生成的无损自呼吸环境音轨，搭配四套抗抖动艺术音乐频谱和多维度成就番茄时钟，为您构筑绝对纯净的深度创作空间。
+                  基于先进 Web Audio API 技术实时生成的无损自呼吸环境音轨，搭配四套抗抖动艺术音乐频谱和多维度成就番茄时钟，构筑纯净深度创作空间。
                 </p>
               </div>
 
               {/* Decorative Live Wave Animation */}
               <div className="h-10 w-full flex items-end justify-center gap-1.5 bg-theme-bg/40 p-2 rounded-xl border border-theme-border/50 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-[9px] text-theme-muted font-mono tracking-wide opacity-100 group-hover:opacity-0 transition-opacity">
-                  等幅律动波形预览
-                </div>
                 <div className="w-1.5 bg-accent/30 h-1 rounded-full group-hover:animate-[pulse_1.2s_infinite_100ms] group-hover:bg-accent group-hover:h-5 transition-all" />
                 <div className="w-1.5 bg-accent/30 h-2 rounded-full group-hover:animate-[pulse_1.2s_infinite_200ms] group-hover:bg-accent group-hover:h-7 transition-all" />
                 <div className="w-1.5 bg-accent/30 h-1.5 rounded-full group-hover:animate-[pulse_1.2s_infinite_300ms] group-hover:bg-accent group-hover:h-4 transition-all" />
                 <div className="w-1.5 bg-accent/30 h-3 rounded-full group-hover:animate-[pulse_1.2s_infinite_400ms] group-hover:bg-accent group-hover:h-6 transition-all" />
                 <div className="w-1.5 bg-accent/30 h-1 rounded-full group-hover:animate-[pulse_1.2s_infinite_150ms] group-hover:bg-accent group-hover:h-3 transition-all" />
                 <div className="w-1.5 bg-accent/30 h-2.5 rounded-full group-hover:animate-[pulse_1.2s_infinite_250ms] group-hover:bg-accent group-hover:h-5 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-1 rounded-full group-hover:animate-[pulse_1.2s_infinite_350ms] group-hover:bg-accent group-hover:h-2 transition-all" />
               </div>
 
               {/* Bullets feature checklist */}
-              <ul className="space-y-2 text-xs text-theme-muted border-t border-theme-border/50 pt-4 font-medium">
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  林间春雨、空谷鸟啼等 5 路自然音轨合成混合
+                  林间春雨、空谷鸟啼等 5 路自然音轨合成
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  极光、重力涟漪、群星宇宙等 4 套自适应频响波形
+                  极光、重力涟漪、群星等 4 套自适应频响波形
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  双声道 10Hz 差频 Alpha 脑电波引导与麦克风环境回授
+                  双声道 10Hz 差频 Alpha 脑电波引导
                 </li>
               </ul>
             </div>
 
             <button
               onClick={() => setSearchParams({ tool: "focus" })}
-              className="mt-6 w-full py-3 bg-accent hover:opacity-90 text-white dark:text-zinc-900 font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+              className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
             >
-              <span>开启深度律动空间</span>
+              <span>开启律动空间</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </motion.div>
 
-          {/* TOOL 2 CARD: 系统硬件与公网监视器 */}
+          {/* TOOL 3 CARD: 系统硬件与公网监视器 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-8 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
           >
             {/* Ambient Background Glow on Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Header Icon & Tag */}
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                  <Cpu size={26} />
+                <div className="w-13 h-13 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                  <Cpu size={24} />
                 </div>
                 <span className="text-[10px] text-accent bg-accent/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
                   物理级感知
@@ -816,53 +891,48 @@ export default function Tools() {
 
               {/* Text Meta */}
               <div className="space-y-2">
-                <h2 className="text-xl font-bold text-theme-text group-hover:text-accent transition-colors">
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
                   系统硬件与公网监视器 (Hardware Monitor)
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  高精度纯前端硬件感知仪。可零延迟洞察物理核心多线程实时负载、匹配显卡底层渲染架构并提供完整的公网 IP 宿主出口、运营商 (ISP) 诊断与吞吐测速。
+                  高精度纯前端硬件感知仪。可零延迟洞察物理核心多线程实时负载、匹配显卡底层渲染架构并提供完整的公网 IP 宿主出口与网络诊断。
                 </p>
               </div>
 
               {/* Decorative Live Wave Animation */}
               <div className="h-10 w-full flex items-center justify-center gap-1.5 bg-theme-bg/40 p-2 rounded-xl border border-theme-border/50 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-[9px] text-theme-muted font-mono tracking-wide opacity-100 group-hover:opacity-0 transition-opacity">
-                  多核线程调度预览
-                </div>
-                <div className="flex-1 grid grid-cols-8 gap-1 h-full items-end group-hover:opacity-100 opacity-20 transition-opacity duration-300">
+                <div className="flex-1 grid grid-cols-6 gap-1 h-full items-end group-hover:opacity-100 opacity-30 transition-opacity duration-300">
                   <div className="bg-accent/40 rounded-xs h-3 group-hover:h-5 transition-all group-hover:animate-pulse" />
                   <div className="bg-accent/40 rounded-xs h-5 group-hover:h-4 transition-all group-hover:animate-pulse" />
                   <div className="bg-accent/40 rounded-xs h-1 group-hover:h-6 transition-all group-hover:animate-pulse" />
                   <div className="bg-accent/40 rounded-xs h-4 group-hover:h-2 transition-all group-hover:animate-pulse" />
                   <div className="bg-accent/40 rounded-xs h-2 group-hover:h-5 transition-all group-hover:animate-pulse" />
                   <div className="bg-accent/40 rounded-xs h-6 group-hover:h-3 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-3 group-hover:h-6 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-5 group-hover:h-4 transition-all group-hover:animate-pulse" />
                 </div>
               </div>
 
               {/* Bullets feature checklist */}
-              <ul className="space-y-2 text-xs text-theme-muted border-t border-theme-border/50 pt-4 font-medium">
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  GPU底层核心匹配（Apple Silicon、NVIDIA、AMD 等）
+                  GPU底层核心匹配（Apple Silicon、NVIDIA等）
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  高频RTT抖动诊断、V8 堆内存(RAM)实时配额监测
+                  高频RTT抖动诊断、V8 堆内存实时配额
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  100% 纯前端免签分析，不上传任何宿主序列号与隐私
+                  100% 纯前端免签分析，不上传任何隐私
                 </li>
               </ul>
             </div>
 
             <button
               onClick={() => setSearchParams({ tool: "hardware" })}
-              className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+              className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
             >
-              <span>运行物理特征重采样</span>
+              <span>运行硬件采样</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </motion.div>
