@@ -1216,38 +1216,64 @@ export default function WorldExecuteMeCanvas({
           ctx.restore();
         }
 
-        // 3. 虎斑猫 (Tabby Cat) 灵动咕噜、眨眼与呼吸尾动 (81.3s - 85.0s)
+        // 3. 虎斑猫 (Tabby Cat) 萌态双耳灵动抖动、眨眼与温和轻晃 (81.3s - 85.0s)
         else if (curTime >= 81.3 && curTime < 85.0) {
           ctx.save();
-          const purrWave = Math.sin(t * 14) * 0.035; // 25Hz 快速咕噜微颤
-          const blink = Math.sin(t * 2) > 0.94;
-          const eyeChars = blink ? "^   ^" : "o   o";
-          const earWiggle = Math.sin(t * 8) > 0 ? "/\\" : "/|";
-          const tailTail = Math.sin(t * 5) > 0 ? ")" : "(";
-
-          // 猫咪声波同心环发散
-          for (let r = 0; r < 3; r++) {
-            const waveR = ((t * 40 + r * 30) % 90) + 15;
-            const waveA = 1 - waveR / 105;
-            ctx.strokeStyle = `rgba(251, 191, 36, ${Math.max(0, waveA * 0.5)})`;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(cx - 180, cy - 30, waveR, 0, Math.PI * 2);
-            ctx.stroke();
+          // 不剧烈震动，保持本体清晰温润，仅有柔和可爱的微呼吸与耳朵生动抖动
+          const blink = Math.sin(t * 1.8) > 0.92;
+          const eyeChars = blink ? "^   ^" : "◕   ◕";
+          
+          // 耳朵周期性可爱俏皮抖动形状: /\, /|, |\, ∧, ^
+          const earCycle = Math.floor((t * 3.5) % 4);
+          let leftEar = "/\\";
+          let rightEar = "/\\";
+          if (earCycle === 1) {
+            leftEar = "/|";
+            rightEar = "/\\";
+          } else if (earCycle === 2) {
+            leftEar = "/\\";
+            rightEar = "|\\";
+          } else if (earCycle === 3) {
+            leftEar = "∧ ";
+            rightEar = " ∧";
           }
 
-          ctx.translate(0, Math.sin(t * 3) * 4);
-          ctx.scale(1 + purrWave, 1 + purrWave);
+          // 尾巴轻柔摇曳
+          const tailPhase = Math.sin(t * 3);
+          const tailTail = tailPhase > 0.3 ? "~)" : tailPhase < -0.3 ? "~(" : " )";
+
+          // 柔和暖金色光晕背景，不晃动画面
+          const catGlow = ctx.createRadialGradient(cx - 180, cy - 25, 10, cx - 180, cy - 25, 95);
+          catGlow.addColorStop(0, "rgba(251, 191, 36, 0.22)");
+          catGlow.addColorStop(1, "transparent");
+          ctx.fillStyle = catGlow;
+          ctx.beginPath();
+          ctx.arc(cx - 180, cy - 25, 95, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 萌化爪印微光浮动 (Paw prints)
+          for (let p = 0; p < 3; p++) {
+            const pawX = cx - 240 + ((p * 55 + (t * 20)) % 130);
+            const pawY = cy + 30 - (((t * 18 + p * 28) % 75));
+            const pawA = Math.max(0, 1 - (cy + 30 - pawY) / 75);
+            ctx.fillStyle = `rgba(253, 224, 71, ${pawA * 0.45})`;
+            ctx.font = '11px "JetBrains Mono", monospace';
+            ctx.fillText("🐾", pawX, pawY);
+          }
+
+          // 极轻微的呆萌上下呼吸悬浮 (稳定清晰，无剧烈抖动)
+          const gentleBreathe = Math.sin(t * 2.5) * 2;
+          ctx.translate(0, gentleBreathe);
 
           const catLines = [
-            `         ${earWiggle}_____/\\`,
+            `         ${leftEar}_____/\\`,
             `        /  ${eyeChars}  \\      class TabbyCat extends FelisCatus {`,
-            "       ( ==  ^  == )       meow() { return 'Purr... world.execute(me);'; }",
-            `        )         ${tailTail}      }`,
-            "       (           )     (=^･ω･^=)  ~ 25Hz Purr Acoustic Resonance ~",
+            "       ( ==  ᴥ  == )       meow() { return 'Purr... world.execute(me);'; }",
+            `        )        ${tailTail}       }`,
+            "       (           )     (=^･ω･^=)  ~ Cute Ear Twitch & Gentle Purr ~",
             "       ( (  )   (  ) )",
             "        (_(__)___)__)",
-            "      [ FELIS CATUS // 斑纹猫咪呼吸咕噜 • 仿生生命体 ]",
+            "      [ FELIS CATUS // 仿生斑纹猫咪 • 灵动萌态双耳抖动 ]",
           ];
           ctx.font = '12px "JetBrains Mono", monospace';
           ctx.fillStyle = "#fbbf24";
@@ -1523,30 +1549,109 @@ export default function WorldExecuteMeCanvas({
           ctx.restore();
         }
 
-        // 7. S & M 机械互锁啮合齿轮 (95.4s - 99.3s) - 真实反向旋转啮合齿牙与火花
+        // 7. 职能角色极性切换 S ⇄ M (95.4s - 99.3s) - 【核心要求】：如同 F/M 一样，说到 S 时 S 渐变大 M 变小，说到 M 时 S 变小 M 渐变大，结合啮合齿轮与动力光环
         else if (curTime >= 95.4 && curTime < 99.3) {
           ctx.save();
-          const gearR = 48;
           const teeth = 12;
-          const rotSpeed = t * 3.5;
+          const rotSpeed = t * 4.0;
 
-          // 函数：绘制真实带齿齿轮
-          const drawInterlockingGear = (gx: number, gy: number, angle: number, color: string, label: string) => {
+          // 精确阶段分析:
+          // 95.40s - 97.40s: "Oh switch my role" (S 与 M 处于动力均衡对等齿轮咬合啮合状态)
+          // 97.40s - 98.35s: "To S" (唱到 S 时：S 剧烈渐变放大至 2.85x 跃迁至中央核心舞台，M 收缩淡出至 0.42x)
+          // 98.35s - 99.30s: "to M" (唱到 M 时：S 剧烈渐变缩小至 0.42x，M 剧烈膨胀放大至 2.85x 统治全场)
+          let scaleS = 1.0;
+          let scaleM = 1.0;
+          let alphaS = 0.9;
+          let alphaM = 0.9;
+          let dominantText = "ROLE REVERSAL IN PROGRESS: [ SUBMISSION S ⇄ DOMINANCE M ]";
+          let dominantColor = "#c084fc";
+
+          if (curTime < 97.40) {
+            // 95.4s - 97.4s: 平衡啮合阶段
+            const prepPulse = Math.sin(t * 6) * 0.08;
+            scaleS = 1.0 + prepPulse;
+            scaleM = 1.0 - prepPulse;
+            alphaS = 0.85;
+            alphaM = 0.85;
+            dominantText = "SWITCH MY ROLE // GEAR INTERLOCK READY";
+            dominantColor = "#c084fc";
+          } else if (curTime >= 97.40 && curTime < 98.35) {
+            // 97.40s - 98.35s: 唱到 "To S" —— S 显著渐变放大，M 渐变缩小
+            const progress = Math.min(1, Math.max(0, (curTime - 97.40) / 0.42));
+            const ease = progress * progress * (3 - 2 * progress); // smoothstep
+            scaleS = 1.0 + ease * 1.85; // 1.0 -> 2.85
+            scaleM = 1.0 - ease * 0.58; // 1.0 -> 0.42
+            alphaS = 0.85 + ease * 0.15; // 1.0 full
+            alphaM = 0.85 - ease * 0.50; // 0.35 dimmed
+            dominantText = ">> [ TO S ]: SUBMISSION AMPLIFIED // SCALE 285% <<";
+            dominantColor = "#a855f7"; // 紫色强调
+          } else {
+            // 98.35s - 99.30s: 唱到 "to M" —— S 显著渐变缩小，M 显著渐变膨胀放大
+            const progress = Math.min(1, Math.max(0, (curTime - 98.35) / 0.42));
+            const ease = progress * progress * (3 - 2 * progress); // smoothstep
+            scaleS = 2.85 - ease * 2.43; // 2.85 -> 0.42
+            scaleM = 0.42 + ease * 2.43; // 0.42 -> 2.85
+            alphaS = 1.0 - ease * 0.65;  // 0.35 dimmed
+            alphaM = 0.35 + ease * 0.65; // 1.0 full
+            dominantText = ">> [ TO M ]: DOMINANCE SURGE // SCALE 285% <<";
+            dominantColor = "#f43f5e"; // 猩红强调
+          }
+
+          // 轨道半径与位置动态迁移：放大的移向画面中央舞台，缩小的退避到外层侧翼
+          const baseOffset = 80;
+          const sWeight = (scaleS - 0.42) / (2.85 - 0.42); // 0 (bg) to 1 (center stage)
+          const mWeight = (scaleM - 0.42) / (2.85 - 0.42);
+
+          // S 偏左向中心迁移，M 偏右向中心迁移
+          const sX = cx - baseOffset * (1 - sWeight * 0.65);
+          const sY = cy - 25;
+          const mX = cx + baseOffset * (1 - mWeight * 0.65);
+          const mY = cy - 25;
+
+          // 连接两者的动力传动电弧与扭矩流
+          ctx.strokeStyle = `rgba(168, 85, 247, ${Math.min(alphaS, alphaM) * 0.6})`;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(sX, sY);
+          const midX = (sX + mX) / 2;
+          const midY = (sY + mY) / 2 + Math.sin(t * 16) * 18;
+          ctx.quadraticCurveTo(midX, midY, mX, mY);
+          ctx.stroke();
+
+          // 函数：绘制高精度带齿机械轮与外环 HUD 括号
+          const drawKineticGearEntity = (
+            gx: number,
+            gy: number,
+            scale: number,
+            alpha: number,
+            angle: number,
+            color: string,
+            symbol: string,
+            subLabel: string
+          ) => {
             ctx.save();
             ctx.translate(gx, gy);
-            ctx.rotate(angle);
-            ctx.strokeStyle = color;
-            ctx.fillStyle = `${color}20`;
-            ctx.lineWidth = 2;
+            ctx.scale(scale, scale);
+            ctx.globalAlpha = alpha;
 
+            // 齿轮外光晕
+            ctx.shadowBlur = scale > 1.8 ? 32 : 12;
+            ctx.shadowColor = color;
+            ctx.strokeStyle = color;
+            ctx.fillStyle = `${color}25`;
+            ctx.lineWidth = scale > 1.8 ? 2.8 : 1.8;
+
+            // 旋转齿轮本身
+            ctx.save();
+            ctx.rotate(angle);
+            const rInner = 32;
+            const rOuter = 44;
             ctx.beginPath();
             for (let i = 0; i < teeth; i++) {
               const a1 = (i * Math.PI * 2) / teeth;
               const a2 = ((i + 0.35) * Math.PI * 2) / teeth;
               const a3 = ((i + 0.65) * Math.PI * 2) / teeth;
               const a4 = ((i + 1) * Math.PI * 2) / teeth;
-              const rInner = gearR - 7;
-              const rOuter = gearR + 7;
 
               if (i === 0) ctx.moveTo(Math.cos(a1) * rInner, Math.sin(a1) * rInner);
               ctx.lineTo(Math.cos(a2) * rOuter, Math.sin(a2) * rOuter);
@@ -1557,42 +1662,74 @@ export default function WorldExecuteMeCanvas({
             ctx.fill();
             ctx.stroke();
 
-            // 内轴孔
+            // 内轴孔与轮辐
             ctx.beginPath();
-            ctx.arc(0, 0, 16, 0, Math.PI * 2);
+            ctx.arc(0, 0, 14, 0, Math.PI * 2);
             ctx.stroke();
+            for (let spk = 0; spk < 4; spk++) {
+              const spkAng = (spk * Math.PI) / 2;
+              ctx.beginPath();
+              ctx.moveTo(Math.cos(spkAng) * 14, Math.sin(spkAng) * 14);
+              ctx.lineTo(Math.cos(spkAng) * 32, Math.sin(spkAng) * 32);
+              ctx.stroke();
+            }
+            ctx.restore();
 
-            ctx.font = 'bold 15px "JetBrains Mono", monospace';
-            ctx.fillStyle = color;
+            // 外部独立自转 HUD 虚线能量环
+            ctx.save();
+            ctx.rotate(-angle * 0.7);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.arc(0, 0, 52, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // 核心字符排印: [ S / M ]
+            ctx.font = 'bold 24px "JetBrains Mono", monospace';
+            ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
-            ctx.fillText(label, 0, 5);
+            ctx.fillText(symbol, 0, 7);
+
+            // 状态标签
+            if (scale > 1.4) {
+              ctx.font = 'bold 9px "JetBrains Mono", monospace';
+              ctx.fillStyle = color;
+              ctx.fillText(subLabel, 0, 24);
+            }
+
             ctx.restore();
           };
 
-          // 左齿轮 (S - 顺时针旋转)
-          drawInterlockingGear(cx - 48, cy - 20, rotSpeed, "#a855f7", "[S]");
-          // 右齿轮 (M - 逆时针旋转，相位对准齿牙咬合)
-          drawInterlockingGear(cx + 48, cy - 20, -rotSpeed + Math.PI / teeth, "#f43f5e", "[M]");
+          // 左侧 [ S ] 实体 (顺时针旋转)
+          drawKineticGearEntity(sX, sY, scaleS, alphaS, rotSpeed, "#c084fc", "S", "SUBMIT");
 
-          // 啮合接触点飞溅的微型火花
-          const contactX = cx;
-          const contactY = cy - 20;
-          for (let sp = 0; sp < 6; sp++) {
-            const sparkAng = (sp * Math.PI) / 3 + t * 20;
-            const sparkDist = 8 + (Math.sin(t * 30 + sp) * 6);
-            ctx.fillStyle = "#fef08a";
+          // 右侧 [ M ] 实体 (逆时针旋转，相位咬合)
+          drawKineticGearEntity(mX, mY, scaleM, alphaM, -rotSpeed + Math.PI / teeth, "#f43f5e", "M", "MASTER");
+
+          // 啮合/碰撞接触点喷溅火花
+          const contactX = (sX + mX) / 2;
+          const contactY = (sY + mY) / 2;
+          for (let sp = 0; sp < 8; sp++) {
+            const sparkAng = (sp * Math.PI) / 4 + t * 22;
+            const sparkDist = 8 + Math.sin(t * 32 + sp) * 8;
+            ctx.fillStyle = sp % 2 === 0 ? "#fef08a" : "#f43f5e";
             ctx.beginPath();
-            ctx.arc(contactX + Math.cos(sparkAng) * sparkDist, contactY + Math.sin(sparkAng) * sparkDist, 1.8, 0, Math.PI * 2);
+            ctx.arc(contactX + Math.cos(sparkAng) * sparkDist, contactY + Math.sin(sparkAng) * sparkDist, 2, 0, Math.PI * 2);
             ctx.fill();
           }
 
-          ctx.font = '14px "JetBrains Mono", monospace';
-          ctx.fillStyle = "#ffffff";
+          // 底部极性指示字幕与读数
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = dominantColor;
+          ctx.font = '15px "JetBrains Mono", monospace';
+          ctx.fillStyle = dominantColor;
           ctx.textAlign = "center";
-          ctx.fillText("MECHANICAL GEAR INTERLOCK: [ SUBMISSION ⇄ DOMINANCE ]", cx, cy + 85);
-          ctx.font = '11px "JetBrains Mono", monospace';
-          ctx.fillStyle = "#a855f7";
-          ctx.fillText("ANGULAR VELOCITY: ±3.5 rad/s // ZERO SLIPPAGE TORQUE", cx, cy + 108);
+          ctx.fillText(dominantText, cx, cy + 95);
+          ctx.font = '12px "JetBrains Mono", monospace';
+          ctx.fillStyle = "#94a3b8";
+          ctx.fillText(`SUBMISSION SCALE: ${(scaleS * 100).toFixed(0)}%  |  DOMINANCE SCALE: ${(scaleM * 100).toFixed(0)}%`, cx, cy + 120);
           ctx.restore();
         }
 
@@ -2084,29 +2221,151 @@ export default function WorldExecuteMeCanvas({
       // SCENE 10: 爱之代数、99% 停滞与终极 world.execute(me); (177.2s - 212.35s)
       else {
         // 177.2s - 188.4s: 真实代数心形方程绘制 (Algebra of Love)
+        // 【核心要求】：加上沿着心脏的强调高亮转圈循环，然后每个鼓点都向外突出去一个心的轮廓形状让画面更丰富
         if (curTime < 188.4) {
           ctx.save();
-          ctx.strokeStyle = "#f43f5e";
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          const heartScale = 7.5 + bass * 3.0;
+          const heartBaseScale = 7.5 + bass * 2.8;
+          const heartCenterY = cy - 40;
 
-          for (let th = 0; th <= Math.PI * 2; th += 0.03) {
+          // 核心鼓点节拍分析 (132 BPM, 节拍间隔 ~0.454s)
+          const beatDuration = 60 / 132;
+          const beatPhase = ((curTime - 177.2) % beatDuration) / beatDuration; // 0.0 ~ 1.0
+          const isDrumBeatKick = beatPhase < 0.22;
+          const drumPunch = isDrumBeatKick ? Math.sin((beatPhase / 0.22) * Math.PI) : 0;
+
+          // 心形参数方程点生成函数 (闭合心脏边界)
+          const getHeartPoint = (th: number, s: number) => {
             const hx = 16 * Math.pow(Math.sin(th), 3);
             const hy = -(13 * Math.cos(th) - 5 * Math.cos(2 * th) - 2 * Math.cos(3 * th) - Math.cos(4 * th));
-            const px = cx + hx * heartScale;
-            const py = cy - 40 + hy * heartScale;
-            if (th === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
+            return {
+              x: cx + hx * s,
+              y: heartCenterY + hy * s,
+            };
+          };
+
+          // -------------------------------------------------------------
+          // 1. 每个鼓点向外突出的多层「心之轮廓形状」冲击波 (Heart-shaped Burst Outlines)
+          // -------------------------------------------------------------
+          const ringCount = 4;
+          for (let r = 0; r < ringCount; r++) {
+            const ringPhase = (beatPhase + r * (1 / ringCount)) % 1.0; // 0.0 -> 1.0
+            const burstScale = heartBaseScale * (1.15 + ringPhase * 1.85); // 向外爆炸扩散 1.15x ~ 3.0x
+            const burstAlpha = Math.max(0, (1 - ringPhase) * 0.85);
+            const burstWidth = Math.max(1, (1 - ringPhase) * 3.5);
+
+            ctx.save();
+            ctx.strokeStyle = r % 2 === 0 ? `rgba(244, 63, 94, ${burstAlpha})` : `rgba(236, 72, 153, ${burstAlpha})`;
+            ctx.shadowBlur = 16 * (1 - ringPhase);
+            ctx.shadowColor = "#f43f5e";
+            ctx.lineWidth = burstWidth;
+            ctx.beginPath();
+
+            for (let s = 0; s <= 72; s++) {
+              const th = (s / 72) * Math.PI * 2;
+              const pt = getHeartPoint(th, burstScale);
+              if (s === 0) ctx.moveTo(pt.x, pt.y);
+              else ctx.lineTo(pt.x, pt.y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
           }
+
+          // -------------------------------------------------------------
+          // 2. 心脏本体 (渐变填充 + 霓虹发光轮廓)
+          // -------------------------------------------------------------
+          const activeScale = heartBaseScale * (1.0 + drumPunch * 0.22);
+
+          // 内部柔和发光填充
+          ctx.beginPath();
+          for (let s = 0; s <= 72; s++) {
+            const th = (s / 72) * Math.PI * 2;
+            const pt = getHeartPoint(th, activeScale);
+            if (s === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.closePath();
+
+          const heartFillGrad = ctx.createRadialGradient(cx, heartCenterY - 10, 10, cx, heartCenterY, activeScale * 18);
+          heartFillGrad.addColorStop(0, `rgba(244, 63, 94, ${0.35 + drumPunch * 0.3})`);
+          heartFillGrad.addColorStop(0.7, "rgba(236, 72, 153, 0.15)");
+          heartFillGrad.addColorStop(1, "transparent");
+          ctx.fillStyle = heartFillGrad;
+          ctx.fill();
+
+          // 心脏主轮廓外线
+          ctx.shadowBlur = 24 + drumPunch * 28;
+          ctx.shadowColor = "#f43f5e";
+          ctx.strokeStyle = "#f43f5e";
+          ctx.lineWidth = 3.2 + drumPunch * 1.5;
           ctx.stroke();
 
-          ctx.font = '13px "JetBrains Mono", monospace';
-          ctx.fillStyle = "#f43f5e";
+          // -------------------------------------------------------------
+          // 3. 沿着心脏边缘高速转圈循环的「强调高亮彗星光粒子」 (Circulating Perimeter Highlights)
+          // -------------------------------------------------------------
+          // 环绕周期：每 1.2 秒转满一圈，双向/多粒子错落追逐
+          const loopTime = (curTime * 1.8) % 1.0; // 0.0 ~ 1.0 沿心脏周边循环参数
+
+          // 绘制多段高亮电光弧 (沿着心形轮廓扫过)
+          const arcHighlightCount = 2;
+          for (let a = 0; a < arcHighlightCount; a++) {
+            const startParam = (loopTime + a * 0.5) % 1.0;
+            ctx.save();
+            ctx.shadowBlur = 35;
+            ctx.shadowColor = "#ffffff";
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 4.5;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+
+            const arcSteps = 16;
+            for (let step = 0; step <= arcSteps; step++) {
+              const currentParam = (startParam + (step / arcSteps) * 0.14) % 1.0;
+              const theta = currentParam * Math.PI * 2;
+              const pt = getHeartPoint(theta, activeScale);
+              if (step === 0) ctx.moveTo(pt.x, pt.y);
+              else ctx.lineTo(pt.x, pt.y);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // 彗星头部高亮极光光点
+            const headTheta = ((startParam + 0.14) % 1.0) * Math.PI * 2;
+            const headPt = getHeartPoint(headTheta, activeScale);
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.shadowBlur = 28;
+            ctx.shadowColor = "#fef08a";
+            ctx.beginPath();
+            ctx.arc(headPt.x, headPt.y, 6.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 外散微粒子
+            for (let sp = 0; sp < 4; sp++) {
+              const spDist = 8 + Math.sin(t * 20 + sp) * 6;
+              const spAng = sp * (Math.PI / 2) + t * 10;
+              ctx.fillStyle = "#fef08a";
+              ctx.beginPath();
+              ctx.arc(headPt.x + Math.cos(spAng) * spDist, headPt.y + Math.sin(spAng) * spDist, 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+
+          // -------------------------------------------------------------
+          // 4. 底部代数公式与数学爱意声明
+          // -------------------------------------------------------------
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = "#f43f5e";
+          ctx.font = 'bold 15px "JetBrains Mono", monospace';
+          ctx.fillStyle = "#ffffff";
           ctx.textAlign = "center";
           ctx.fillText("(x² + y² - 1)³ - x²y³ = 0", cx, cy + 100);
+          ctx.font = '13px "JetBrains Mono", monospace';
+          ctx.fillStyle = "#f43f5e";
           ctx.fillText("I KNOW THE ALGEBRAIC EXPRESSION OF L-O-V-E", cx, cy + 125);
-          ctx.fillText("[ ∇(LOVE) = 0 // Q.E.D. 爱是纯粹不变解 ]", cx, cy + 148);
+          ctx.fillStyle = "#fbcfe8";
+          ctx.fillText("[ ∇(LOVE) = 0 // Q.E.D. 爱是纯粹不变解 • 鼓点共振律动 ]", cx, cy + 148);
           ctx.restore();
         }
 
