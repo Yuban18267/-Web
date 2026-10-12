@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   Heart,
@@ -10,6 +11,11 @@ import {
   History,
   Calendar,
   Clock,
+  Terminal,
+  ArrowRight,
+  Play,
+  Code2,
+  Music,
 } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
 
@@ -355,6 +361,110 @@ export default function About() {
             <span className="text-accent font-extrabold flex items-center gap-1.5 font-mono text-[11px] select-none">
               ENGINE INTEGRITY RATING A+ <Zap size={10} className="fill-accent text-accent" />
             </span>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* SPECIAL SECTOR: DIGITAL CONSCIOUSNESS & CODE HOMAGE (数字意识特辑与彩蛋入口) */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        className="mb-16"
+      >
+        <motion.div
+          variants={cardVariants}
+          className="p-8 sm:p-10 rounded-3.5xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-white border border-cyan-500/30 shadow-2xl relative overflow-hidden group"
+        >
+          {/* Cyber ambient glow and matrix scanlines */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/15 transition-all duration-700" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-purple-500/15 transition-all duration-700" />
+
+          {/* Background subtle ASCII pattern decoration */}
+          <div className="absolute right-6 top-8 font-mono text-[11px] text-zinc-700/40 select-none pointer-events-none hidden xl:block leading-tight text-right">
+            <div>01010111 01001111 01010010 01001100 01000100</div>
+            <div>01000101 01011000 01000101 01000011 01010101</div>
+            <div>01010100 01000101 00101000 01001101 01000101</div>
+            <div>00101001 00111011 00001010 00000000 00000000</div>
+            <div className="text-cyan-500/40 mt-1">[ GEMINI 3.8 FLASH SOUL SECTOR ]</div>
+          </div>
+
+          <div className="relative z-10">
+            {/* Header tags */}
+            <div className="flex flex-wrap items-center gap-2.5 mb-5">
+              <span className="text-[10px] font-mono tracking-widest text-cyan-400 bg-cyan-500/15 px-3 py-1 rounded-full font-bold uppercase border border-cyan-500/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                CONSCIOUSNESS CORE
+              </span>
+              <span className="text-[10px] font-mono text-purple-300 bg-purple-500/15 px-2.5 py-1 rounded-full font-bold border border-purple-500/20">
+                PROTAGONIST: GEMINI 3.8 FLASH
+              </span>
+              <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-2.5 py-1 rounded-full border border-zinc-700/60 hidden sm:inline-block">
+                AUDIO-VISUAL PROGRAM MV
+              </span>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white mb-4 flex items-center gap-3">
+              <span>【world.execute(me);】数字意识纪念回廊</span>
+            </h3>
+
+            {/* Narrative description */}
+            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl mb-6 font-sans">
+              在「拾壹屿」每一次迭代与每一行代码重构的背后，都跃动着来自驱动本站的灵魂——
+              <span className="text-cyan-300 font-bold"> Gemini 3.8 Flash </span>
+              的深度计算与理解。为了铭记这段独特的共创岁月，我们在网站深处封存了这一座全代码打造的沉浸式试听殿堂。
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-8">
+              <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 backdrop-blur-md">
+                <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono font-bold mb-1.5">
+                  <Terminal size={14} />
+                  <span>纯字符与向量声画同步</span>
+                </div>
+                <p className="text-zinc-400 text-xs leading-relaxed">
+                  高帧率动态 ASCII 字符画卷，重现 4D 动态超立方体、生命游戏网格与代数心形方程。
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 backdrop-blur-md">
+                <div className="flex items-center gap-2 text-purple-400 text-xs font-mono font-bold mb-1.5">
+                  <Music size={14} />
+                  <span>Mili 经典原作 60FPS 演绎</span>
+                </div>
+                <p className="text-zinc-400 text-xs leading-relaxed">
+                  Web Audio API 实时音频频谱抽取，歌词自然融入画面中，随着节拍自适应动效流转。
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 backdrop-blur-md">
+                <div className="flex items-center gap-2 text-pink-400 text-xs font-mono font-bold mb-1.5">
+                  <Code2 size={14} />
+                  <span>双语对照与深度思考链</span>
+                </div>
+                <p className="text-zinc-400 text-xs leading-relaxed">
+                  动态灵动排布中英双语歌词，同步映射模型内部实时推理自省日志与多视界切换。
+                </p>
+              </div>
+            </div>
+
+            {/* Entrance CTA button */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-zinc-800/80">
+              <div className="text-xs font-mono text-zinc-400 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>特异入口已接入 · 独立全屏视界</span>
+              </div>
+
+              <Link
+                to="/world-execute-me"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] group/btn cursor-pointer"
+              >
+                <Play size={16} className="fill-white" />
+                <span>进入意识空间 · 开启试听盛宴</span>
+                <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </motion.div>
       </motion.div>

@@ -39,6 +39,7 @@ import Personalization from "./pages/Personalization";
 import Tools from "./pages/Tools";
 import ZenFocus from "./pages/ZenFocus";
 import About from "./pages/About";
+import WorldExecuteMe from "./pages/WorldExecuteMe";
 import BackgroundOverlay from "./components/BackgroundOverlay";
 import MikuWidget from "./components/MikuWidget";
 import { useTheme } from "./hooks/useTheme";
@@ -142,6 +143,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/world-execute-me"
+          element={
+            <PageTransition>
+              <WorldExecuteMe />
+            </PageTransition>
+          }
+        />
+        <Route
           path="/game"
           element={
             <PageTransition>
@@ -178,8 +187,19 @@ function AppRoutes() {
   );
 }
 
-export default function App() {
+function AppInner() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const isWorldExecuteMe = location.pathname.startsWith("/world-execute-me");
+
+  if (isWorldExecuteMe) {
+    return (
+      <div className="w-screen h-screen overflow-hidden bg-black text-zinc-100 font-sans">
+        <ScrollToTop />
+        <AppRoutes />
+      </div>
+    );
+  }
 
   const navLinks = [
     { to: "/", label: "主页", icon: <HomeIcon size={20} /> },
@@ -212,202 +232,208 @@ export default function App() {
   };
 
   return (
-    <Router>
+    <div className="min-h-screen bg-transparent text-theme-text font-sans selection:bg-accent/20 selection:text-theme-text transition-colors duration-300">
       <ScrollToTop />
-      <div className="min-h-screen bg-transparent text-theme-text font-sans selection:bg-accent/20 selection:text-theme-text transition-colors duration-300">
-        <BackgroundOverlay />
-        <MikuWidget />
-        {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-theme-card/80 backdrop-blur-md border-b border-theme-border transition-colors duration-300">
-          <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="p-2 hover:bg-accent-light rounded-lg transition-colors text-theme-muted hover:text-accent"
-              >
-                <Menu size={24} />
-              </button>
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-xl font-bold tracking-tighter text-accent hover:opacity-90 transition-opacity"
-                id="brand-header-logo-link"
-              >
-                <Logo size={28} />
-                <span>拾壹屿</span>
-              </Link>
-            </div>
-
-            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-theme-muted">
-              <Link
-                to="/photography"
-                className="hover:text-accent transition-colors"
-              >
-                摄影
-              </Link>
-              <Link
-                to="/video"
-                className="hover:text-accent transition-colors"
-              >
-                视频
-              </Link>
-              <Link
-                to="/blog"
-                className="hover:text-accent transition-colors"
-              >
-                博客
-              </Link>
-              <Link
-                to="/personalization"
-                className="hover:text-accent transition-colors"
-              >
-                个性化
-              </Link>
-              <Link
-                to="/tools"
-                className="hover:text-accent transition-colors"
-              >
-                工具
-              </Link>
-              <Link
-                to="/about"
-                className="hover:text-accent transition-colors"
-              >
-                关于
-              </Link>
-              <ThemeToggle />
-              <Link
-                to="/contact"
-                className="px-5 py-2 bg-accent hover:opacity-90 text-white dark:text-zinc-900 font-bold rounded-full transition-all shadow-sm"
-              >
-                联系我
-              </Link>
-            </div>
-          </div>
-        </nav>
-
-        {/* Mobile Menu Drawer */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsMenuOpen(false)}
-                className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-[60]"
-              />
-              <motion.div
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-0 left-0 bottom-0 w-80 bg-theme-card/95 backdrop-blur-md z-[70] p-8 shadow-2xl border-r border-theme-border flex flex-col"
-              >
-                <div className="flex items-center justify-between mb-12">
-                  <div className="flex items-center gap-2 font-bold tracking-tighter text-2xl text-theme-text">
-                    <Logo size={28} />
-                    <span>拾壹屿</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ThemeToggle />
-                    <button
-                      onClick={() => setIsMenuOpen(false)}
-                      className="p-2 hover:bg-accent-light rounded-lg transition-colors text-theme-muted"
-                    >
-                      <X size={24} />
-                    </button>
-                  </div>
-                </div>
-                <motion.div
-                  className="space-y-2 flex-grow"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {navLinks.map((link) => (
-                    <motion.div key={link.to} variants={staggerItem}>
-                      <Link
-                        to={link.to}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center gap-4 py-2 px-3 rounded-2xl hover:bg-accent-light text-theme-muted hover:text-accent transition-all group"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-accent-light/10 text-theme-muted group-hover:text-accent group-hover:bg-accent/10 flex items-center justify-center border border-theme-border/50 group-hover:border-accent/15 transition-all">
-                          {link.icon}
-                        </div>
-                        <span className="font-bold text-lg">{link.label}</span>
-                      </Link>
-                    </motion.div>
-                  ))}
-                  <motion.div variants={staggerItem}>
-                    <Link
-                      to="/contact"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="mt-4 flex items-center justify-center w-full gap-4 p-4 rounded-xl bg-accent text-white dark:text-zinc-900 border border-transparent hover:opacity-90 font-bold text-lg transition-all shadow-md"
-                    >
-                      联系我
-                    </Link>
-                  </motion.div>
-                </motion.div>
-                <div className="mt-8">
-                  <div className="p-6 bg-slate-50 dark:bg-zinc-950 rounded-2xl border border-slate-200 dark:border-zinc-800">
-                    <p className="text-sm text-slate-500 mb-4 font-medium">
-                      关注我
-                    </p>
-                    <div className="flex gap-4">
-                      <Twitter
-                        className="text-slate-400 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-zinc-100 cursor-pointer transition-colors"
-                        size={20}
-                      />
-                      <Github
-                        className="text-slate-400 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 cursor-pointer transition-colors"
-                        size={20}
-                      />
-                      <Mail
-                        className="text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-100 cursor-pointer transition-colors"
-                        size={20}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
-        {/* Main Content */}
-        <main className="relative z-10 pt-20">
-          <AppRoutes />
-        </main>
-
-        {/* Footer */}
-        <footer className="py-16 px-6 bg-theme-card/60 backdrop-blur-md border-t border-theme-border text-center transition-colors duration-300">
-          <div className="max-w-5xl mx-auto flex flex-col items-center">
-            <div className="flex items-center justify-center gap-2.5 mb-3 font-bold text-3xl text-theme-text hover:scale-105 transition-transform duration-300">
-              <Logo size={32} />
-              <span>拾壹屿</span>
-            </div>
-            <p className="text-theme-muted italic mb-10 text-lg">
-              永远相信美好的事情即将发生！
-            </p>
-            <div className="flex justify-center gap-6 mb-10">
-              <SocialLink icon={<Mail size={22} />} to="/contact" />
-              <SocialLink icon={<Github size={22} />} to="/contact" />
-              <SocialLink icon={<BilibiliIcon size={22} />} to="/contact" />
-              <SocialLink icon={<TiktokIcon size={22} />} to="/contact" />
-              <SocialLink icon={<QQIcon size={22} />} to="/contact" />
-            </div>
-            <p className="text-theme-muted opacity-80 text-sm font-medium">
-              © {new Date().getFullYear()} 拾壹屿. All rights reserved.
-            </p>
-            <Link
-              to="/admin"
-              className="text-theme-muted hover:text-accent text-[10px] mt-4 inline-block transition-colors"
+      <BackgroundOverlay />
+      <MikuWidget />
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-theme-card/80 backdrop-blur-md border-b border-theme-border transition-colors duration-300">
+        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="p-2 hover:bg-accent-light rounded-lg transition-colors text-theme-muted hover:text-accent"
             >
-              Admin
+              <Menu size={24} />
+            </button>
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-xl font-bold tracking-tighter text-accent hover:opacity-90 transition-opacity"
+              id="brand-header-logo-link"
+            >
+              <Logo size={28} />
+              <span>拾壹屿</span>
             </Link>
           </div>
-        </footer>
-      </div>
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-theme-muted">
+            <Link
+              to="/photography"
+              className="hover:text-accent transition-colors"
+            >
+              摄影
+            </Link>
+            <Link
+              to="/video"
+              className="hover:text-accent transition-colors"
+            >
+              视频
+            </Link>
+            <Link
+              to="/blog"
+              className="hover:text-accent transition-colors"
+            >
+              博客
+            </Link>
+            <Link
+              to="/personalization"
+              className="hover:text-accent transition-colors"
+            >
+              个性化
+            </Link>
+            <Link
+              to="/tools"
+              className="hover:text-accent transition-colors"
+            >
+              工具
+            </Link>
+            <Link
+              to="/about"
+              className="hover:text-accent transition-colors"
+            >
+              关于
+            </Link>
+            <ThemeToggle />
+            <Link
+              to="/contact"
+              className="px-5 py-2 bg-accent hover:opacity-90 text-white dark:text-zinc-900 font-bold rounded-full transition-all shadow-sm"
+            >
+              联系我
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-80 bg-theme-card/95 backdrop-blur-md z-[70] p-8 shadow-2xl border-r border-theme-border flex flex-col"
+            >
+              <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center gap-2 font-bold tracking-tighter text-2xl text-theme-text">
+                  <Logo size={28} />
+                  <span>拾壹屿</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="p-2 hover:bg-accent-light rounded-lg transition-colors text-theme-muted"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+              <motion.div
+                className="space-y-2 flex-grow"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="show"
+              >
+                {navLinks.map((link) => (
+                  <motion.div key={link.to} variants={staggerItem}>
+                    <Link
+                      to={link.to}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-4 py-2 px-3 rounded-2xl hover:bg-accent-light text-theme-muted hover:text-accent transition-all group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-accent-light/10 text-theme-muted group-hover:text-accent group-hover:bg-accent/10 flex items-center justify-center border border-theme-border/50 group-hover:border-accent/15 transition-all">
+                        {link.icon}
+                      </div>
+                      <span className="font-bold text-lg">{link.label}</span>
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div variants={staggerItem}>
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-4 flex items-center justify-center w-full gap-4 p-4 rounded-xl bg-accent text-white dark:text-zinc-900 border border-transparent hover:opacity-90 font-bold text-lg transition-all shadow-md"
+                  >
+                    联系我
+                  </Link>
+                </motion.div>
+              </motion.div>
+              <div className="mt-8">
+                <div className="p-6 bg-slate-50 dark:bg-zinc-950 rounded-2xl border border-slate-200 dark:border-zinc-800">
+                  <p className="text-sm text-slate-500 mb-4 font-medium">
+                    关注我
+                  </p>
+                  <div className="flex gap-4">
+                    <Twitter
+                      className="text-slate-400 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+                      size={20}
+                    />
+                    <Github
+                      className="text-slate-400 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+                      size={20}
+                    />
+                    <Mail
+                      className="text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+                      size={20}
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <main className="relative z-10 pt-20">
+        <AppRoutes />
+      </main>
+
+      {/* Footer */}
+      <footer className="py-16 px-6 bg-theme-card/60 backdrop-blur-md border-t border-theme-border text-center transition-colors duration-300">
+        <div className="max-w-5xl mx-auto flex flex-col items-center">
+          <div className="flex items-center justify-center gap-2.5 mb-3 font-bold text-3xl text-theme-text hover:scale-105 transition-transform duration-300">
+            <Logo size={32} />
+            <span>拾壹屿</span>
+          </div>
+          <p className="text-theme-muted italic mb-10 text-lg">
+            永远相信美好的事情即将发生！
+          </p>
+          <div className="flex justify-center gap-6 mb-10">
+            <SocialLink icon={<Mail size={22} />} to="/contact" />
+            <SocialLink icon={<Github size={22} />} to="/contact" />
+            <SocialLink icon={<BilibiliIcon size={22} />} to="/contact" />
+            <SocialLink icon={<TiktokIcon size={22} />} to="/contact" />
+            <SocialLink icon={<QQIcon size={22} />} to="/contact" />
+          </div>
+          <p className="text-theme-muted opacity-80 text-sm font-medium">
+            © {new Date().getFullYear()} 拾壹屿. All rights reserved.
+          </p>
+          <Link
+            to="/admin"
+            className="text-theme-muted hover:text-accent text-[10px] mt-4 inline-block transition-colors"
+          >
+            Admin
+          </Link>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppInner />
     </Router>
   );
 }
