@@ -39,7 +39,6 @@ import Personalization from "./pages/Personalization";
 import Tools from "./pages/Tools";
 import ZenFocus from "./pages/ZenFocus";
 import About from "./pages/About";
-import WorldExecuteMe from "./pages/WorldExecuteMe";
 import BackgroundOverlay from "./components/BackgroundOverlay";
 import MikuWidget from "./components/MikuWidget";
 import { useTheme } from "./hooks/useTheme";
@@ -143,14 +142,6 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/world-execute-me"
-          element={
-            <PageTransition>
-              <WorldExecuteMe />
-            </PageTransition>
-          }
-        />
-        <Route
           path="/game"
           element={
             <PageTransition>
@@ -190,16 +181,6 @@ function AppRoutes() {
 function AppInner() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const isWorldExecuteMe = location.pathname.startsWith("/world-execute-me");
-
-  if (isWorldExecuteMe) {
-    return (
-      <div className="w-screen h-screen overflow-hidden bg-black text-zinc-100 font-sans">
-        <ScrollToTop />
-        <AppRoutes />
-      </div>
-    );
-  }
 
   const navLinks = [
     { to: "/", label: "主页", icon: <HomeIcon size={20} /> },

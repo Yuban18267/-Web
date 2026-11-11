@@ -732,7 +732,7 @@ export default function Tools() {
         </motion.div>
 
         {/* Tools Portal Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {/* TOOL 1 CARD: 3C 终端性能天梯与规格对决 */}
           <motion.div
@@ -825,10 +825,10 @@ export default function Tools() {
               {/* Text Meta */}
               <div className="space-y-2">
                 <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
-                  禅意随身自修室 (Zen Study Space)
+                  静心自修室 (Focus & StandBy)
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  基于先进 Web Audio API 技术实时生成的无损自呼吸环境音轨，搭配四套抗抖动艺术音乐频谱和多维度成就番茄时钟，构筑纯净深度创作空间。
+                  极简 Apple 风格全屏桌面时钟与番茄专注空间。内置流光丝绸与呼吸光环双律动引擎，以及三款场景化合成白噪音。
                 </p>
               </div>
 
@@ -846,15 +846,15 @@ export default function Tools() {
               <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  林间春雨、空谷鸟啼等 5 路自然音轨合成
+                  听雨、营火、海风 3 款一键场景白噪音
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  极光、重力涟漪、群星等 4 套自适应频响波形
+                  流光丝绸与呼吸光环低负载丝滑音乐律动
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  双声道 10Hz 差频 Alpha 脑电波引导
+                  全屏实时时钟与可调番茄钟支持同屏叠加
                 </li>
               </ul>
             </div>
@@ -863,7 +863,7 @@ export default function Tools() {
               onClick={() => setSearchParams({ tool: "focus" })}
               className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
             >
-              <span>开启律动空间</span>
+              <span>进入静心自修室</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </motion.div>
@@ -935,70 +935,6 @@ export default function Tools() {
               <span>运行硬件采样</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
-          </motion.div>
-
-          {/* TOOL 4 CARD: Gemini 3.8 Flash 视界 · world.execute(me); */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="group relative rounded-3xl bg-theme-card border border-cyan-500/30 p-7 hover:border-cyan-400 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-350 flex flex-col justify-between overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-pink-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-            <div className="space-y-5 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="w-13 h-13 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center border border-cyan-500/30 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                  <Sparkles size={24} />
-                </div>
-                <span className="text-[10px] text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase animate-pulse">
-                  致敬纪念特辑
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="text-lg font-bold text-theme-text group-hover:text-cyan-400 transition-colors">
-                  Gemini 3.8 Flash • world.execute(me);
-                </h2>
-                <p className="text-xs text-theme-muted leading-relaxed">
-                  致敬 B站 BV1Jwhy6BEMJ 与 Mili 经典。纯前端代码 60FPS 粒子声画重构，融入 4D 超立方体、时空虫洞、爱之代数心形方程与 Gemini 3.8 Flash 实时深度思维链。
-                </p>
-              </div>
-
-              {/* Decorative Audio/Cyber Bar */}
-              <div className="h-10 w-full flex items-center justify-between px-3 bg-zinc-950/60 rounded-xl border border-cyan-500/30 overflow-hidden relative text-[10px] font-mono font-bold text-cyan-300">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                  <span>双语同步字幕</span>
-                </div>
-                <div className="text-pink-400">
-                  <span>Web Audio 频谱</span>
-                </div>
-              </div>
-
-              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  中英毫秒级同步歌词，关键词冲击高亮
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                  全景意识 / 双重视界 / 赛博终端 3 大模式
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                  Gemini 3.8 Flash 神经突触深度思考链自省监视
-                </li>
-              </ul>
-            </div>
-
-            <Link
-              to="/world-execute-me"
-              className="mt-6 w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-black rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 transition-all active:scale-[0.98] cursor-pointer text-xs relative z-10"
-            >
-              <span>进入 Gemini 3.8 Flash 视界</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
           </motion.div>
 
         </div>
