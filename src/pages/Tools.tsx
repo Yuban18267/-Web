@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useSearchParams } from "react-router-dom";
 import ZenFocus from "./ZenFocus";
-import BenchmarkCompare from "./BenchmarkCompare";
 import {
   Cpu,
   Monitor,
@@ -13,14 +12,12 @@ import {
   Laptop,
   Terminal,
   Activity,
-  Zap,
   RotateCcw,
   RefreshCw,
   ArrowRight,
   ArrowLeft,
   Sparkles,
   ShieldCheck,
-  Award,
   Wifi,
 } from "lucide-react";
 
@@ -1058,16 +1055,6 @@ export default function Tools() {
   };
 
   // --- SUB-TOOL ROUTING ---
-  if (currentTool === "benchmark") {
-    return (
-      <div className="pt-20">
-        <BenchmarkCompare
-          onBackToTools={() => setSearchParams({ tool: "list" })}
-        />
-      </div>
-    );
-  }
-
   if (currentTool === "focus") {
     return (
       <div className="pt-20">
@@ -1090,7 +1077,7 @@ export default function Tools() {
   // ============================================================================
   if (currentTool === "list") {
     return (
-      <div className="pt-24 pb-32 px-6 max-w-6xl mx-auto min-h-[72vh] flex flex-col justify-center">
+      <div className="pt-24 pb-32 px-6 max-w-5xl mx-auto min-h-[72vh] flex flex-col justify-center">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -1105,73 +1092,17 @@ export default function Tools() {
             网页效率工具箱
           </h1>
           <p className="text-theme-muted max-w-2xl text-sm md:text-base leading-relaxed">
-            直观、好用的在线工具合集。提供数码设备性能排行榜与参数对比、全屏番茄钟自习室，以及本机硬件配置与实时网速检测。
+            轻量、纯净的在线实用工具。提供全屏桌面时钟与白噪音番茄自习室，以及本机硬件配置、屏幕实时刷新率与网速检测看板。
           </p>
         </motion.div>
 
-        {/* 3-Column Bento Portal Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* CARD 1: 终端性能天梯 */}
+        {/* 2-Column Symmetric Bento Portal Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* CARD 1: 静心自修室 */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.04 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between overflow-hidden"
-          >
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/15 group-hover:scale-105 transition-transform duration-300">
-                  <Award size={22} />
-                </div>
-                <span className="text-xs text-theme-muted font-mono">
-                  数码排行 · 参数对比
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors tracking-tight">
-                  设备性能天梯与对比
-                </h2>
-                <p className="text-xs text-theme-muted leading-relaxed">
-                  收录主流手机、笔记本电脑、平板与智能手表的详细配置和跑分，支持同时挑选 2～4 款设备同屏对比。
-                </p>
-              </div>
-
-              <div className="h-10 w-full flex items-center justify-between px-3.5 bg-theme-bg/60 rounded-2xl border border-theme-border/60 text-[11px] font-mono text-theme-muted">
-                <span className="text-accent font-semibold flex items-center gap-1.5">
-                  <Zap size={12} />
-                  性能跑分
-                </span>
-                <span>·</span>
-                <span>同屏参数对比</span>
-                <span>·</span>
-                <span>六维能力图</span>
-              </div>
-
-              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5">
-                <li>· 涵盖苹果、华为、小米等主流机型</li>
-                <li>· 芯片、屏幕、相机、电池充电一目了然</li>
-                <li>· 支持一键只看不同点，选机更省心</li>
-              </ul>
-            </div>
-
-            <button
-              onClick={() => setSearchParams({ tool: "benchmark" })}
-              className="mt-6 w-full py-3 bg-accent text-white font-semibold rounded-2xl flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
-            >
-              <span>进入天梯与对比</span>
-              <ArrowRight
-                size={14}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
-          </motion.div>
-
-          {/* CARD 2: 静心自修室 */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
+            transition={{ duration: 0.45, delay: 0.05 }}
             className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
             <div className="space-y-5">
@@ -1210,7 +1141,7 @@ export default function Tools() {
 
             <button
               onClick={() => setSearchParams({ tool: "focus" })}
-              className="mt-6 w-full py-3 bg-theme-bg hover:bg-accent hover:text-white text-theme-text border border-theme-border hover:border-accent font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
+              className="mt-6 w-full py-3 bg-accent text-white font-semibold rounded-2xl flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
             >
               <span>进入静心自修室</span>
               <ArrowRight
