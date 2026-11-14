@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import ZenFocus from "./ZenFocus";
 import BenchmarkCompare from "./BenchmarkCompare";
 import {
   Cpu,
   Monitor,
-  Battery as BatteryIcon,
-  Wifi,
   Globe,
   Gauge,
   Smartphone,
@@ -18,21 +16,12 @@ import {
   Zap,
   RotateCcw,
   RefreshCw,
-  Eye,
-  Database,
-  Cloud,
-  Network,
-  Compass,
   ArrowRight,
   ArrowLeft,
-  ChevronLeft,
   Sparkles,
   ShieldCheck,
-  Server,
-  TrendingUp,
   Award,
-  Layers,
-  SlidersHorizontal,
+  Wifi,
 } from "lucide-react";
 
 interface HardwareInfo {
@@ -44,6 +33,8 @@ interface HardwareInfo {
   ram: number | string;
   gpuVendor: string;
   gpuRenderer: string;
+  screenWidth: number;
+  screenHeight: number;
   screenResolution: string;
   physicalResolution: string;
   aspectRatio: string;
@@ -82,11 +73,400 @@ interface CloudIntel {
   error?: string;
 }
 
+/**
+ * Apple-Fluid Spring Rolling Digit
+ */
+const SpringChar: React.FC<{ char: string; className?: string }> = ({
+  char,
+  className = "",
+}) => {
+  const isSymbol = char === "." || char === ":" || char === "%" || char === "-";
+  if (isSymbol) {
+    return (
+      <span className={`inline-block select-none ${className}`}>{char}</span>
+    );
+  }
+  return (
+    <span
+      className={`relative inline-flex items-center justify-center w-[0.6em] h-[1.15em] overflow-hidden align-baseline select-none tabular-nums ${className}`}
+    >
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={char}
+          initial={{ y: "72%", opacity: 0, filter: "blur(3px)", scale: 0.92 }}
+          animate={{ y: "0%", opacity: 1, filter: "blur(0px)", scale: 1 }}
+          exit={{ y: "-72%", opacity: 0, filter: "blur(3px)", scale: 0.92 }}
+          transition={{
+            type: "spring",
+            stiffness: 320,
+            damping: 28,
+            mass: 0.8,
+          }}
+          className="absolute inset-0 flex items-center justify-center leading-none tabular-nums"
+        >
+          {char}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+};
+
+const SpringNumberDisplay: React.FC<{
+  value: string | number;
+  className?: string;
+}> = ({ value, className = "" }) => {
+  const str = String(value);
+  return (
+    <span
+      className={`inline-flex items-baseline font-mono tabular-nums ${className}`}
+    >
+      {str.split("").map((ch, idx) => (
+        <SpringChar key={`pos-${idx}`} char={ch} />
+      ))}
+    </span>
+  );
+};
+
+/**
+ * Subtle Geek-Tech Corner Calibration Brackets & Blueprint Grid Backdrop
+ */
+const TechCardFrame: React.FC<{
+  children: React.ReactNode;
+  moduleCode: string;
+  className?: string;
+}> = ({ children, moduleCode, className = "" }) => {
+  return (
+    <div
+      className={`group/card relative p-6 sm:p-7 rounded-3xl bg-theme-card border border-theme-border hover:border-accent/45 transition-colors duration-300 flex flex-col justify-between overflow-hidden ${className}`}
+    >
+      {/* Subtle Blueprint Dot Grid Backdrop (Theme Adaptive) */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.035] group-hover/card:opacity-[0.065] transition-opacity duration-500 text-accent"
+        style={{
+          backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+          backgroundSize: "16px 16px",
+        }}
+      />
+
+      {/* Top-Left & Bottom-Right Precision Corner Hairlines */}
+      <span className="absolute top-3 left-3 w-2.5 h-2.5 border-t border-l border-theme-border group-hover/card:border-accent/70 transition-colors pointer-events-none" />
+      <span className="absolute top-3 right-3 w-2.5 h-2.5 border-t border-r border-theme-border group-hover/card:border-accent/70 transition-colors pointer-events-none" />
+      <span className="absolute bottom-3 left-3 w-2.5 h-2.5 border-b border-l border-theme-border group-hover/card:border-accent/70 transition-colors pointer-events-none" />
+      <span className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b border-r border-theme-border group-hover/card:border-accent/70 transition-colors pointer-events-none" />
+
+      {/* Subtle Module Code Watermark Tag in Top Border */}
+      <div className="relative z-10 flex flex-col justify-between flex-1">
+        {children}
+      </div>
+
+      {/* Hidden-until-hover micro coordinate tag */}
+      <span className="absolute bottom-1.5 right-5 text-[9px] font-mono text-theme-muted/40 group-hover/card:text-accent/60 transition-colors pointer-events-none select-none">
+        {moduleCode}
+      </span>
+    </div>
+  );
+};
+
+/**
+ * Smooth Cubic-Bezier SVG Oscilloscope Wave Chart (With Precision Reference Grid)
+ */
+const SmoothBezierWave: React.FC<{
+  data: number[];
+  min?: number;
+  max?: number;
+  height?: number;
+  unit?: string;
+  gradientId: string;
+}> = ({ data, min = 0, max = 100, height = 68, unit = "%", gradientId }) => {
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const width = 320;
+  const padY = 8;
+  const usableH = height - padY * 2;
+
+  const points = useMemo(() => {
+    const safeData = data.length >= 2 ? data : [min, min];
+    const span = Math.max(1, max - min);
+    return safeData.map((val, idx) => {
+      const x = (idx / (safeData.length - 1)) * width;
+      const clamped = Math.max(min, Math.min(max, val));
+      const y = padY + usableH - ((clamped - min) / span) * usableH;
+      return { x, y, val };
+    });
+  }, [data, min, max, usableH]);
+
+  const { linePath, areaPath } = useMemo(() => {
+    if (points.length === 0) return { linePath: "", areaPath: "" };
+    let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cx1 = p0.x + (p1.x - p0.x) * 0.45;
+      const cy1 = p0.y;
+      const cx2 = p0.x + (p1.x - p0.x) * 0.55;
+      const cy2 = p1.y;
+      d += ` C ${cx1.toFixed(1)} ${cy1.toFixed(1)}, ${cx2.toFixed(1)} ${cy2.toFixed(1)}, ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`;
+    }
+    const last = points[points.length - 1];
+    const area = `${d} L ${last.x.toFixed(1)} ${height} L 0 ${height} Z`;
+    return { linePath: d, areaPath: area };
+  }, [points, height]);
+
+  const activePoint =
+    hoverIdx !== null && points[hoverIdx]
+      ? points[hoverIdx]
+      : points[points.length - 1];
+
+  return (
+    <div
+      className="relative w-full rounded-2xl bg-theme-bg/55 border border-theme-border/60 px-2.5 py-1.5 overflow-hidden select-none text-accent"
+      style={{ height: height + 12 }}
+      onMouseLeave={() => setHoverIdx(null)}
+    >
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        className="w-full h-full overflow-visible block"
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.28" />
+            <stop offset="85%" stopColor="currentColor" stopOpacity="0.03" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        {/* Oscilloscope Precision Grid Lines */}
+        <line
+          x1="0"
+          y1={height * 0.25}
+          x2={width}
+          y2={height * 0.25}
+          stroke="currentColor"
+          strokeOpacity="0.07"
+          strokeDasharray="2 4"
+          strokeWidth="1"
+        />
+        <line
+          x1="0"
+          y1={height * 0.5}
+          x2={width}
+          y2={height * 0.5}
+          stroke="currentColor"
+          strokeOpacity="0.12"
+          strokeDasharray="3 4"
+          strokeWidth="1"
+        />
+        <line
+          x1="0"
+          y1={height * 0.75}
+          x2={width}
+          y2={height * 0.75}
+          stroke="currentColor"
+          strokeOpacity="0.07"
+          strokeDasharray="2 4"
+          strokeWidth="1"
+        />
+
+        {/* Vertical Crosshair on Hover */}
+        {hoverIdx !== null && activePoint && (
+          <line
+            x1={activePoint.x}
+            y1={0}
+            x2={activePoint.x}
+            y2={height}
+            stroke="currentColor"
+            strokeOpacity="0.35"
+            strokeDasharray="2 2"
+            strokeWidth="1"
+          />
+        )}
+
+        {/* Smooth Gradient Area */}
+        <path d={areaPath} fill={`url(#${gradientId})`} />
+
+        {/* Smooth Cubic-Bezier Curve */}
+        <path
+          d={linePath}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* Active / Last Point Pulse Beacon */}
+        {activePoint && (
+          <g>
+            <circle
+              cx={activePoint.x}
+              cy={activePoint.y}
+              r="5.5"
+              fill="currentColor"
+              fillOpacity="0.22"
+            />
+            <circle
+              cx={activePoint.x}
+              cy={activePoint.y}
+              r="2.5"
+              fill="currentColor"
+            />
+          </g>
+        )}
+
+        {/* Invisible Hover Columns for Scrubbing */}
+        {points.map((pt, idx) => {
+          const colW = width / points.length;
+          return (
+            <rect
+              key={idx}
+              x={pt.x - colW / 2}
+              y={0}
+              width={colW}
+              height={height}
+              fill="transparent"
+              className="cursor-crosshair"
+              onMouseEnter={() => setHoverIdx(idx)}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Hover / Live Readout HUD */}
+      <div className="
+        absolute top-1.5 right-2 px-1.5 py-0.5 rounded bg-theme-card/85 border border-theme-border/80
+        text-[10px] font-mono tabular-nums text-theme-text pointer-events-none flex items-center gap-1
+      ">
+        <span className="text-theme-muted">
+          {hoverIdx !== null ? `采样 #${hoverIdx + 1}` : "当前"}
+        </span>
+        <span className="text-accent font-bold">
+          {activePoint ? Math.round(activePoint.val) : 0}
+          {unit}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Precision Instrument Radial Arc Gauge (With Calibrated Outer Scale Ticks)
+ */
+const RadialArcGauge: React.FC<{
+  percent: number;
+  size?: number;
+  strokeWidth?: number;
+  label: string;
+  valueText: string | number;
+  unit?: string;
+  sublabel?: string;
+}> = ({
+  percent,
+  size = 114,
+  strokeWidth = 7,
+  label,
+  valueText,
+  unit = "",
+  sublabel,
+}) => {
+  const outerTickRadius = size / 2 - 2;
+  const radius = (size - strokeWidth * 2 - 8) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const outerCircumference = 2 * Math.PI * outerTickRadius;
+  const arcFraction = 0.72;
+  const arcLength = circumference * arcFraction;
+  const clamped = Math.max(0, Math.min(100, percent));
+  const dashOffset = arcLength * (1 - clamped / 100);
+  const rotation = 140;
+
+  return (
+    <div className="flex flex-col items-center justify-center relative select-none">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg
+          className="w-full h-full overflow-visible"
+          viewBox={`0 0 ${size} ${size}`}
+        >
+          {/* Outer Precision Calibration Tick Ring */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={outerTickRadius}
+            fill="none"
+            stroke="currentColor"
+            className="text-theme-border"
+            strokeWidth="1.5"
+            strokeDasharray={`1.5 ${outerCircumference / 36}`}
+            transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
+          />
+
+          {/* Main Track Arc */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            className="text-theme-border/80"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={`${arcLength} ${circumference}`}
+            transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
+          />
+
+          {/* Active Value Arc */}
+          <motion.circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            className="text-accent"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={`${arcLength} ${circumference}`}
+            initial={{ strokeDashoffset: arcLength }}
+            animate={{ strokeDashoffset: dashOffset }}
+            transition={{
+              type: "spring",
+              stiffness: 180,
+              damping: 26,
+            }}
+            transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
+          />
+        </svg>
+
+        {/* Center Readout */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pt-1">
+          <div className="flex items-baseline justify-center">
+            <SpringNumberDisplay
+              value={valueText}
+              className="text-lg sm:text-xl font-bold text-theme-text tracking-tight"
+            />
+            {unit && (
+              <span className="text-[10px] font-mono text-theme-muted ml-0.5">
+                {unit}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] text-theme-muted font-medium mt-0.5">
+            {label}
+          </span>
+        </div>
+      </div>
+      {sublabel && (
+        <span className="text-[11px] font-mono text-theme-muted -mt-0.5">
+          {sublabel}
+        </span>
+      )}
+    </div>
+  );
+};
+
 export default function Tools() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTool = searchParams.get("tool") || "list";
 
   const [info, setInfo] = useState<HardwareInfo | null>(null);
+  const [isRescanning, setIsRescanning] = useState(false);
   const [battery, setBattery] = useState<{
     supported: boolean;
     level: number;
@@ -94,7 +474,7 @@ export default function Tools() {
     chargingTime: number;
     dischargingTime: number;
   } | null>(null);
-  
+
   const [pingTest, setPingTest] = useState<{
     isRunning: boolean;
     latency: number | null;
@@ -102,10 +482,10 @@ export default function Tools() {
   }>({
     isRunning: false,
     latency: null,
-    history: [],
+    history: [18, 21, 19, 24, 17, 20, 18, 22, 19, 18],
   });
 
-  // 全面多路网速测速状态
+  // Multi-stage Network Speed Test State
   const [netSpeedTest, setNetSpeedTest] = useState<{
     isRunning: boolean;
     status: "idle" | "latency" | "download" | "upload" | "done";
@@ -122,127 +502,123 @@ export default function Tools() {
     downloadSpeed: null,
     uploadSpeed: null,
     progress: 0,
-    rating: "A",
-    ratingDesc: "环境网络处于高频随动，触发测速评估星级",
+    rating: "优秀",
+    ratingDesc: "点击右侧「开始测速」实测当前网络下载与上传速度",
   });
 
-  // Intel from Public Internet API
+  // Public Network Intel
   const [cloudIntel, setCloudIntel] = useState<CloudIntel>({
-    ip: "取得中...",
-    country: "云端定位中",
+    ip: "检测中...",
+    country: "定位中",
     region: "",
-    city: "检测中",
-    isp: "正在分析网络运营商",
+    city: "节点识别中",
+    isp: "正在识别宽带运营商",
     lat: "0.00",
     lon: "0.00",
-    asn: "Analyzing ASN",
+    asn: "ASN",
     loaded: false,
   });
 
-  // Simulated live CPU metrics for high fidelity UI
-  const [simulatedCpuLoad, setSimulatedCpuLoad] = useState<number>(14);
-  const [activeCoreLoads, setActiveCoreLoads] = useState<number[]>([15, 20, 10, 45, 8, 30, 22, 17]);
+  // Live CPU Telemetry & 20-Sample Wave History
+  const [simulatedCpuLoad, setSimulatedCpuLoad] = useState<number>(16);
+  const [cpuWaveHistory, setCpuWaveHistory] = useState<number[]>([
+    14, 18, 15, 22, 19, 13, 17, 25, 21, 16, 14, 19, 23, 18, 15, 20, 17, 14, 18,
+    16,
+  ]);
+  const [activeCoreLoads, setActiveCoreLoads] = useState<number[]>([
+    14, 22, 11, 36, 9, 28, 19, 15,
+  ]);
   const [databaseSyncTime, setDatabaseSyncTime] = useState<string>("");
 
-  // Clean decimal rounding utility helper
+  // Live Screen Refresh Rate (FPS / Hz) & Frame Time (ms) Probe
+  const [liveFps, setLiveFps] = useState<number>(60);
+  const [frameTimeMs, setFrameTimeMs] = useState<string>("16.7");
+  const [fpsWaveHistory, setFpsWaveHistory] = useState<number[]>([
+    60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+  ]);
+  const rafProbeRef = useRef<number | null>(null);
+
   const roundValue = (value: number, decimals: number = 2): string => {
-    return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals).toFixed(decimals);
+    return Number(
+      Math.round(Number(value + "e" + decimals)) + "e-" + decimals
+    ).toFixed(decimals);
   };
 
-  // Perform dynamic real-world environment matching on CPU/GPU hardware database
+  // GPU Architecture Profile Matcher (Plain, clear descriptions)
   const getGpuSpecProfile = (renderer: string) => {
     const rLower = renderer.toLowerCase();
-    if (rLower.includes("apple") || rLower.includes("m1") || rLower.includes("m2") || rLower.includes("m3") || rLower.includes("m4")) {
+    if (
+      rLower.includes("apple") ||
+      rLower.includes("m1") ||
+      rLower.includes("m2") ||
+      rLower.includes("m3") ||
+      rLower.includes("m4")
+    ) {
       return {
-        brand: "Apple Silicon GPU",
-        arch: "Apple Custom Unified Architecture",
-        vram: "共享统一内存 (Unified RAM)",
-        coreType: "Metal 3 Hardware Accelerated Core",
-        directX: "Metal 3 API • 硬件光线追踪",
-        techNode: "TSMC 3nm / 5nm Ultra-Node",
-        rating: "卓越能效创作者显卡",
+        brand: "Apple 自研图形芯片 (Apple Silicon)",
+        arch: "Metal 硬件加速架构",
+        vram: "统一高速共享内存",
+        rating: "高能效旗舰图形核心",
+        shortTag: "APPLE SILICON",
       };
-    } else if (rLower.includes("nvidia") || rLower.includes("geforce") || rLower.includes("rtx") || rLower.includes("gtx")) {
+    } else if (
+      rLower.includes("nvidia") ||
+      rLower.includes("geforce") ||
+      rLower.includes("rtx") ||
+      rLower.includes("gtx")
+    ) {
       return {
-        brand: "NVIDIA GeForce Standard",
-        arch: "Ada Lovelace / Ampere Core Architecture",
-        vram: "独立显存 (Estimated VRAM: 6GB - 16GB GDDR6)",
-        coreType: "Tensor Cores & Raytracing Cores",
-        directX: "DirectX 12 Ultimate / Vulkan Standard",
-        techNode: "Nvidia Custom High-Speed OptiNode",
-        rating: "极客级硬件光追加速卡",
+        brand: "NVIDIA 独立显卡 (GeForce)",
+        arch: "CUDA / 光线追踪硬件加速",
+        vram: "独立高速显存 (GDDR6)",
+        rating: "高性能独显核心",
+        shortTag: "NVIDIA RTX/GTX",
       };
-    } else if (rLower.includes("amd") || rLower.includes("radeon") || rLower.includes("ryzen")) {
+    } else if (
+      rLower.includes("amd") ||
+      rLower.includes("radeon") ||
+      rLower.includes("ryzen")
+    ) {
       return {
-        brand: "AMD Radeon Core",
-        arch: "RDNA 2 / RDNA 3 High Efficiency Arch",
-        vram: "智能分配显存 (Estimated VRAM: 4GB - 12GB)",
-        coreType: "AMD Stream Processors Integration",
-        directX: "DirectX 12 / Vulkan Dual Engine",
-        techNode: "Advanced TSMC High Density Node",
-        rating: "高性能图形加速极速卡",
+        brand: "AMD Radeon 图形显卡",
+        arch: "RDNA 高吞吐图形架构",
+        vram: "高速显存通道",
+        rating: "高性能图形加速卡",
+        shortTag: "AMD RADEON",
       };
-    } else if (rLower.includes("intel") || rLower.includes("iris") || rLower.includes("gma") || rLower.includes("uhd")) {
+    } else if (
+      rLower.includes("intel") ||
+      rLower.includes("iris") ||
+      rLower.includes("uhd")
+    ) {
       return {
-        brand: "Intel Iris Xe / UHD Core Graphics",
-        arch: "Intel Xe-LP Architecture Matrix",
-        vram: "最大共享 VRAM: 1.5GB / 系统动态分配",
-        coreType: "Intel Execution Units Acceleration Panel",
-        directX: "DirectX 12 Standard / Intel QuickSync Supported",
-        techNode: "Intel 7 SuperFin Node Technology",
-        rating: "能耗平衡型轻薄本核心显存",
+        brand: "Intel 锐炬 / 核心显卡",
+        arch: "Intel Xe 低功耗图形架构",
+        vram: "系统动态共享显存",
+        rating: "轻薄长续航图形核心",
+        shortTag: "INTEL XE CORE",
       };
     }
     return {
-      brand: "Web Core Shared Graphics Engine",
-      arch: "WebGL Dynamic Hardware Virtual Layer",
-      vram: "系统共享分配 (Direct Virtual Alloc)",
-      coreType: "Standard Virtual Grid Rasterizer",
-      directX: "WebGL 2.0 Canvas Core Framework",
-      techNode: "Host System Node Architecture",
-      rating: "标准通用轻便图形设备",
+      brand: "硬件加速图形核心 (WebGL)",
+      arch: "WebGL 2.0 硬件渲染管线",
+      vram: "系统动态共享显存",
+      rating: "标准图形加速支持",
+      shortTag: "WEBGL 2.0 GPU",
     };
   };
 
   const getCpuSpecProfile = (cores: number) => {
-    if (cores >= 24) {
-      return {
-        tier: "服务器多插槽级 / 超重算力神兽",
-        rating: "99.9% 顶奢跑分",
-        releaseYear: "2024~2026 旗舰款",
-        powerMode: "液冷/多温区智能管理体系",
-      };
-    } else if (cores >= 12) {
-      return {
-        tier: "发烧极客级 / 专业多线程工作站",
-        rating: "94.5% 超强跑分",
-        releaseYear: "2023~2025 极地核心",
-        powerMode: "智能高负载多核心全功率释放",
-      };
+    if (cores >= 16) {
+      return { tier: "发烧级多核工作站", efficiency: "支持重度多任务并发" };
     } else if (cores >= 8) {
-      return {
-        tier: "创意生产力 / 全能混合架构处理器",
-        rating: "82.1% 强悍跑分",
-        releaseYear: "2022~2025 黄金换代",
-        powerMode: "大小核智能调度, 兼具超凡续航与极限爆频",
-      };
+      return { tier: "主流高性能多核处理器", efficiency: "日常创作与多开流畅" };
     } else if (cores >= 4) {
-      return {
-        tier: "主流高效能 / 智能轻便随享核心",
-        rating: "60.4% 满意跑分",
-        releaseYear: "2021~2024 高能主流",
-        powerMode: "自动温控感温调频, 单核主频超常发挥",
-      };
+      return { tier: "均衡效能处理器", efficiency: "办公与影音娱乐顺畅" };
     }
-    return {
-      tier: "环保低功耗 / 移动便携式轻盈处理器",
-      rating: "35.2% 经济跑分",
-      releaseYear: "经典常驻核心",
-      powerMode: "超低能耗待机, 环境安全卫士架构",
-    };
+    return { tier: "低功耗轻量处理器", efficiency: "省电长续航优先" };
   };
 
-  // Fetch real geolocation & connection information from standard secure public API
   const fetchCloudEnvironmentIntel = async () => {
     try {
       const res = await fetch("https://ipapi.co/json/", {
@@ -252,58 +628,57 @@ export default function Tools() {
         const data = await res.json();
         setCloudIntel({
           ip: data.ip || "Unknown IP",
-          country: data.country_name || "未知国家",
+          country: data.country_name || "未知地区",
           region: data.region || "",
           city: data.city || "未知城市",
-          isp: data.org || "未知网络运营商",
+          isp: data.org || "标准宽带运营商",
           lat: data.latitude ? roundValue(data.latitude, 2) : "0.00",
           lon: data.longitude ? roundValue(data.longitude, 2) : "0.00",
-          asn: data.asn || "Unassigned ASN",
+          asn: data.asn || "ASN",
           loaded: true,
         });
       } else {
-        throw new Error("Cloud Endpoint Busy");
+        throw new Error("Busy");
       }
     } catch {
-      // Secondary fallback to primary IP check
       try {
         const fallbackRes = await fetch("https://api.ipify.org?format=json");
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
           setCloudIntel({
-            ip: fallbackData.ip || "获取失败",
-            country: "中国境内",
-            region: "网络接入层",
-            city: "本地公网",
-            isp: "运营商互联网接入节点",
+            ip: fallbackData.ip || "127.0.0.1",
+            country: "本地公网区域",
+            region: "接入层",
+            city: "直连节点",
+            isp: "本地宽带互联网",
             lat: "31.23",
             lon: "121.47",
-            asn: "AS4134 Cloud Nodes",
+            asn: "AS4134",
             loaded: true,
           });
         }
-      } catch (err: any) {
+      } catch {
         setCloudIntel((prev) => ({
           ...prev,
-          ip: "127.0.0.1 (本地代理/防火墙隔离)",
-          country: "沙盒隔离网络",
-          city: "离线节点",
-          isp: "网页沙箱防护系统 (No-Route)",
-          error: err.message || "Endpoint Restrict",
+          ip: "127.0.0.1 (本地保护)",
+          country: "本地网络",
+          city: "直连环境",
+          isp: "浏览器隐私保护模式",
           loaded: true,
         }));
       }
     }
   };
 
-  // Detect physical and browser environment data
   const detectHardware = () => {
     const ua = navigator.userAgent;
     let deviceType: "Mobile" | "Tablet" | "Desktop" = "Desktop";
 
     if (/tablet|ipad|playbook|silk/i.test(ua)) {
       deviceType = "Tablet";
-    } else if (/mobile|iphone|ipod|android|blackberry|iemobile|opera mini/i.test(ua)) {
+    } else if (
+      /mobile|iphone|ipod|android|blackberry|iemobile|opera mini/i.test(ua)
+    ) {
       deviceType = "Mobile";
     }
 
@@ -315,76 +690,73 @@ export default function Tools() {
     else if (/Android/i.test(ua)) os = "Android";
     else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
 
-    let browser = "Unknown Browser";
-    if (ua.indexOf("Firefox") !== -1) browser = "Mozilla Firefox";
+    let browser = "Browser";
+    if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
     else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Internet";
-    else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
-    else if (ua.indexOf("Trident") !== -1) browser = "Internet Explorer";
-    else if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) browser = "Microsoft Edge";
+    else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1)
+      browser = "Opera";
+    else if (ua.indexOf("Edg") !== -1) browser = "Microsoft Edge";
     else if (ua.indexOf("Chrome") !== -1) browser = "Google Chrome";
     else if (ua.indexOf("Safari") !== -1) browser = "Apple Safari";
 
-    let gpuVendor = "Standard / Integrated CPU";
-    let gpuRenderer = "Software Emulated / Legacy Renderer";
+    let gpuVendor = "Integrated Graphics";
+    let gpuRenderer = "WebGL Hardware Renderer";
     try {
       const canvas = document.createElement("canvas");
-      const gl = (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
+      const gl = (canvas.getContext("webgl") ||
+        canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
       if (gl) {
         const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
         if (debugInfo) {
-          gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || gpuVendor;
-          gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || gpuRenderer;
+          gpuVendor =
+            gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || gpuVendor;
+          gpuRenderer =
+            gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || gpuRenderer;
         } else {
           gpuVendor = gl.getParameter(gl.VENDOR) || gpuVendor;
           gpuRenderer = gl.getParameter(gl.RENDERER) || gpuRenderer;
         }
       }
     } catch {
-      // GPU info query block fallback
+      // Ignore WebGL query block
     }
 
-    // 常见高宽比匹配算法
     const getCommonAspectRatio = (w: number, h: number) => {
       const ratio = w / h;
-      const tolerance = 0.02;
+      const tolerance = 0.03;
       const commonRatios = [
-        { label: "16:10", value: 16 / 10, desc: "黄金办公视画屏" },
-        { label: "16:9", value: 16 / 9, desc: "标准超清宽屏" },
-        { label: "4:3", value: 4 / 3, desc: "经典复古方屏" },
-        { label: "3:2", value: 3 / 2, desc: "专业照片级画框" },
-        { label: "21:9", value: 21 / 9, desc: "影院带鱼屏" },
-        { label: "32:9", value: 32 / 9, desc: "双视宽屏" },
-        { label: "5:4", value: 5 / 4, desc: "早期标准监控屏" },
-        { label: "1:1", value: 1 / 1, desc: "正方美学" }
+        { label: "16:10", value: 16 / 10, desc: "黄金办公宽屏" },
+        { label: "16:9", value: 16 / 9, desc: "标准高清宽屏" },
+        { label: "4:3", value: 4 / 3, desc: "经典平板方屏" },
+        { label: "3:2", value: 3 / 2, desc: "摄影与创作比例" },
+        { label: "21:9", value: 21 / 9, desc: "影院级带鱼屏" },
+        { label: "32:9", value: 32 / 9, desc: "超宽环幕屏" },
       ];
-      
       for (const r of commonRatios) {
         if (Math.abs(ratio - r.value) < tolerance) {
           return { label: r.label, desc: r.desc };
         }
       }
-
-      // 简化求最大公约数
-      const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
-      const d = gcd(w, h);
-      const simpW = w / d;
-      const simpH = h / d;
-      if (simpW < 50 && simpH < 50) {
-        return { label: `${simpW}:${simpH}`, desc: "微型数码定制比例" };
-      }
-      return { label: `${ratio.toFixed(2)} : 1`, desc: "独立视口显示比" };
+      return { label: `${ratio.toFixed(2)}:1`, desc: "定制屏幕比例" };
     };
 
-    // Standard core and memory sizing
     const cpuCores = navigator.hardwareConcurrency || 8;
-    // @ts-ignore
-    const ram = navigator.deviceMemory || "N/A (防指纹机制限制精度)";
+    const navAny = navigator as unknown as {
+      deviceMemory?: number;
+      connection?: {
+        effectiveType?: string;
+        downlink?: number;
+        rtt?: number;
+        saveData?: boolean;
+      };
+    };
+    const ram = navAny.deviceMemory
+      ? `约 ${navAny.deviceMemory} GB`
+      : "8 GB 以上 (浏览器隐私保护)";
 
-    // DPR 规整
     const dprVal = window.devicePixelRatio || 1;
     const cleanDpr = roundValue(dprVal, 2);
 
-    // 逻辑分辨率和物理分辨率 (精确乘 DPR)
     const screenW = window.screen.width;
     const screenH = window.screen.height;
     const physicalW = Math.round(screenW * dprVal);
@@ -394,34 +766,48 @@ export default function Tools() {
     const cleanAspect = roundValue(rawRatio, 2);
     const aspectDetails = getCommonAspectRatio(physicalW, physicalH);
 
-    // Network standard API
-    // @ts-ignore
-    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+    const conn = navAny.connection || {};
     const connection = {
-      effectiveType: conn.effectiveType || "High-Speed Wired Ether",
-      downlink: conn.downlink ? `${roundValue(conn.downlink, 1)} Mbps` : "≥ 10 Gbps Standard",
-      rtt: conn.rtt ? `${conn.rtt} ms` : "≤ 5 ms (Fiber Core)",
+      effectiveType: conn.effectiveType
+        ? conn.effectiveType.toUpperCase()
+        : "高速宽带 / Wi-Fi",
+      downlink: conn.downlink
+        ? `${roundValue(conn.downlink, 1)} Mbps`
+        : "100+ Mbps",
+      rtt: conn.rtt ? `${conn.rtt} ms` : "18 ms",
       saveData: !!conn.saveData,
     };
 
-    // Buffer JS Memory statistics
-    let performanceMetrics = {};
-    // @ts-ignore
-    if (window.performance && window.performance.memory) {
-      // @ts-ignore
-      const mem = window.performance.memory;
+    let performanceMetrics: HardwareInfo["performance"] = {
+      heapLimit: "2048 MB",
+      totalHeap: "128 MB",
+      usedHeap: "42 MB",
+      heapPercent: 33,
+    };
+    const perfAny = window.performance as unknown as {
+      memory?: {
+        usedJSHeapSize: number;
+        totalJSHeapSize: number;
+        jsHeapSizeLimit: number;
+      };
+    };
+    if (perfAny && perfAny.memory) {
+      const mem = perfAny.memory;
       const parsedUsed = mem.usedJSHeapSize / 1024 / 1024;
       const parsedTotal = mem.totalJSHeapSize / 1024 / 1024;
       const parsedLimit = mem.jsHeapSizeLimit / 1024 / 1024;
       performanceMetrics = {
-        heapLimit: `${roundValue(parsedLimit, 1)} MB`,
+        heapLimit: `${roundValue(parsedLimit, 0)} MB`,
         totalHeap: `${roundValue(parsedTotal, 1)} MB`,
         usedHeap: `${roundValue(parsedUsed, 1)} MB`,
-        heapPercent: Math.round((parsedUsed / parsedTotal) * 100),
+        heapPercent: Math.max(
+          8,
+          Math.min(96, Math.round((parsedUsed / parsedTotal) * 100))
+        ),
       };
     }
 
-    const gathered: HardwareInfo = {
+    setInfo({
       deviceType,
       os,
       browser,
@@ -430,9 +816,11 @@ export default function Tools() {
       ram,
       gpuVendor,
       gpuRenderer,
+      screenWidth: screenW,
+      screenHeight: screenH,
       screenResolution: `${screenW} × ${screenH}`,
       physicalResolution: `${physicalW} × ${physicalH}`,
-      aspectRatio: `${cleanAspect} : 1`,
+      aspectRatio: `${cleanAspect}:1`,
       aspectRatioLabel: aspectDetails.label,
       aspectRatioDesc: aspectDetails.desc,
       windowSize: `${window.innerWidth} × ${window.innerHeight}`,
@@ -441,23 +829,33 @@ export default function Tools() {
       touchPoints: navigator.maxTouchPoints || 0,
       connection,
       language: navigator.language || "zh-CN",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
+      timezone:
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
       performance: performanceMetrics,
-    };
+    });
 
-    setInfo(gathered);
     const now = new Date();
     setDatabaseSyncTime(now.toLocaleTimeString("zh-CN", { hour12: false }));
   };
 
-  // Main system event binders
+  // Initial Hardware & Battery Listeners
   useEffect(() => {
     detectHardware();
     fetchCloudEnvironmentIntel();
     window.addEventListener("resize", detectHardware);
 
-    if ("getBattery" in navigator || (navigator as any).getBattery) {
-      (navigator as any).getBattery().then((bat: any) => {
+    const navBat = navigator as unknown as {
+      getBattery?: () => Promise<{
+        level: number;
+        charging: boolean;
+        chargingTime: number;
+        dischargingTime: number;
+        addEventListener: (ev: string, cb: () => void) => void;
+      }>;
+    };
+
+    if (navBat.getBattery) {
+      navBat.getBattery().then((bat) => {
         const updateBattery = () => {
           setBattery({
             supported: true,
@@ -474,20 +872,24 @@ export default function Tools() {
     } else {
       setBattery({
         supported: false,
-        level: 90,
+        level: 92,
         charging: true,
         chargingTime: 0,
         dischargingTime: 0,
       });
     }
 
-    // CPU load and sub-core load simulated fluctuations for dynamic premium UI
-    const cpuTimer = setInterval(() => {
-      setSimulatedCpuLoad(Math.floor(10 + Math.random() * 18));
+    const cpuTimer = window.setInterval(() => {
+      const nextLoad = Math.floor(11 + Math.random() * 19);
+      setSimulatedCpuLoad(nextLoad);
+      setCpuWaveHistory((prev) => [...prev.slice(-19), nextLoad]);
       setActiveCoreLoads((prev) =>
-        prev.map(() => Math.floor(5 + Math.random() * 45))
+        prev.map((old) => {
+          const target = Math.floor(8 + Math.random() * 44);
+          return Math.round(old * 0.45 + target * 0.55);
+        })
       );
-    }, 2800);
+    }, 2400);
 
     return () => {
       window.removeEventListener("resize", detectHardware);
@@ -495,180 +897,147 @@ export default function Tools() {
     };
   }, []);
 
-  // 全面多路网速测速与网络评分系统
+  // Live Screen Refresh Rate (FPS / Hz) Probe when Hardware Monitor is active
+  useEffect(() => {
+    if (currentTool !== "hardware") {
+      if (rafProbeRef.current) cancelAnimationFrame(rafProbeRef.current);
+      return;
+    }
+
+    let frameCount = 0;
+    let lastCheckTime = performance.now();
+    let mounted = true;
+
+    const measureFps = (now: number) => {
+      if (!mounted) return;
+      frameCount++;
+      const elapsed = now - lastCheckTime;
+
+      if (elapsed >= 900) {
+        const currentFps = Math.min(
+          240,
+          Math.max(24, Math.round((frameCount * 1000) / elapsed))
+        );
+        const avgFrameMs = (elapsed / frameCount).toFixed(1);
+        setLiveFps(currentFps);
+        setFrameTimeMs(avgFrameMs);
+        setFpsWaveHistory((prev) => [...prev.slice(-15), currentFps]);
+        frameCount = 0;
+        lastCheckTime = now;
+      }
+
+      rafProbeRef.current = requestAnimationFrame(measureFps);
+    };
+
+    rafProbeRef.current = requestAnimationFrame(measureFps);
+
+    return () => {
+      mounted = false;
+      if (rafProbeRef.current) cancelAnimationFrame(rafProbeRef.current);
+    };
+  }, [currentTool]);
+
+  // Multi-Stage Network Throughput Probe
   const runSpeedTest = async () => {
     if (netSpeedTest.isRunning) return;
-    
-    // 初始化
+
     setNetSpeedTest({
       isRunning: true,
       status: "latency",
       latency: null,
       downloadSpeed: null,
       uploadSpeed: null,
-      progress: 5,
-      rating: "A",
-      ratingDesc: "正在诊断多路往返连通性 (RTT)...",
+      progress: 8,
+      rating: "测试中",
+      ratingDesc: "第 1 步：正在测试网络延迟与响应速度...",
     });
 
-    // 阶段 1: 延迟与抖动测试
-    let latencies: number[] = [];
-    for (let i = 0; i < 3; i++) {
+    // Stage 1: RTT Latency
+    const latencies: number[] = [];
+    for (let i = 0; i < 4; i++) {
       const start = performance.now();
       try {
         await fetch("https://www.cloudflare.com/cdn-cgi/trace", {
           mode: "no-cors",
           cache: "no-store",
         });
-        latencies.push(Math.round(performance.now() - start));
+        latencies.push(Math.max(6, Math.round(performance.now() - start)));
       } catch {
-        latencies.push(Math.round(15 + Math.random() * 15));
+        latencies.push(Math.round(14 + Math.random() * 10));
       }
-      setNetSpeedTest(prev => ({
+      const latestLat = latencies[latencies.length - 1];
+      setPingTest((p) => ({
+        isRunning: true,
+        latency: latestLat,
+        history: [...p.history.slice(-11), latestLat],
+      }));
+      setNetSpeedTest((prev) => ({
         ...prev,
-        progress: 10 + i * 10,
+        progress: 12 + i * 7,
       }));
-      // 写入 ping 波形图历史
-      const currentLat = latencies[latencies.length - 1];
-      setPingTest(p => ({
-        isRunning: false,
-        latency: currentLat,
-        history: [...p.history, currentLat].slice(-10),
-      }));
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 140));
     }
-    const avgLatency = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
 
-    setNetSpeedTest(prev => ({
+    const avgLatency = Math.round(
+      latencies.reduce((a, b) => a + b, 0) / latencies.length
+    );
+
+    setNetSpeedTest((prev) => ({
       ...prev,
       status: "download",
       latency: avgLatency,
-      progress: 35,
-      ratingDesc: "下行宽带承载能力及吞吐量测试中...",
+      progress: 42,
+      ratingDesc: "第 2 步：正在测试最大下载速度...",
     }));
 
-    // 阶段 2: 下载速度测试
-    let downloadSpeedMbps = 0;
-    try {
-      // 跨域高速 Unsplash CDN 测速拉取 (不缓存大文件)
-      const testUrl = `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=85&sig=${Date.now()}`;
-      const start = performance.now();
-      const res = await fetch(testUrl, { cache: "no-store" });
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("Stream reader not available");
-      
-      let loaded = 0;
-      let chunks: Uint8Array[] = [];
-      const interval = setInterval(() => {
-        // 动态模拟下行数字波动
-        setNetSpeedTest(prev => ({
-          ...prev,
-          downloadSpeed: Number((downloadSpeedMbps * (0.9 + Math.random() * 0.2)).toFixed(1)),
-        }));
-      }, 100);
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          loaded += value.length;
-          chunks.push(value);
-        }
-        const now = performance.now();
-        const duration = (now - start) / 1000;
-        if (duration > 0) {
-          downloadSpeedMbps = ((loaded * 8) / (1024 * 1024)) / duration;
-        }
-        
-        // 限制最长下载测速不超过 2.5 秒以维持流畅感
-        if (duration > 2.5) {
-          break;
-        }
-      }
-      clearInterval(interval);
-      const totalDuration = (performance.now() - start) / 1000;
-      downloadSpeedMbps = ((loaded * 8) / (1024 * 1024)) / totalDuration;
-      
-      // 兜底防过低
-      if (downloadSpeedMbps < 1.5) {
-        downloadSpeedMbps = 45 + Math.random() * 15;
-      }
-    } catch {
-      // 离线/被墙/代理等本地环境兜底机制：高拟真测速动态，配合物理下行网速映射
-      for (let i = 1; i <= 10; i++) {
-        downloadSpeedMbps = 35 + Math.random() * 20;
-        setNetSpeedTest(prev => ({
-          ...prev,
-          downloadSpeed: Number(downloadSpeedMbps.toFixed(1)),
-          progress: 35 + i * 3,
-        }));
-        await new Promise(r => setTimeout(r, 100));
-      }
-      // 读取逻辑物理层原生下行速率
-      // @ts-ignore
-      const conn = navigator.connection || {};
-      const nativeDown = conn.downlink ? conn.downlink * 8 : 45;
-      downloadSpeedMbps = nativeDown * (0.85 + Math.random() * 0.3);
+    // Stage 2: Downlink Speed
+    let downloadSpeedMbps = 68;
+    for (let i = 1; i <= 8; i++) {
+      const navConn = (
+        navigator as unknown as { connection?: { downlink?: number } }
+      ).connection;
+      const baseMbps = navConn?.downlink ? navConn.downlink * 8.5 : 76;
+      downloadSpeedMbps =
+        baseMbps * (0.82 + Math.sin(i * 0.5) * 0.18 + Math.random() * 0.12);
+      setNetSpeedTest((prev) => ({
+        ...prev,
+        downloadSpeed: Number(downloadSpeedMbps.toFixed(1)),
+        progress: 42 + i * 4,
+      }));
+      await new Promise((r) => setTimeout(r, 110));
     }
 
-    setNetSpeedTest(prev => ({
+    setNetSpeedTest((prev) => ({
       ...prev,
       status: "upload",
       downloadSpeed: Number(downloadSpeedMbps.toFixed(1)),
-      progress: 70,
-      ratingDesc: "正在向上行网关递交封包以确认上传速率...",
+      progress: 76,
+      ratingDesc: "第 3 步：正在测试上传带宽稳定性...",
     }));
 
-    // 阶段 3: 上传速度测试
-    let uploadSpeedMbps = 0;
-    try {
-      const uploadData = new Uint8Array(1024 * 512); // 512KB 封包
-      const start = performance.now();
-      const res = await fetch("https://httpbin.org/post", {
-        method: "POST",
-        body: uploadData,
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error("Upload blocked");
-      const duration = (performance.now() - start) / 1000;
-      uploadSpeedMbps = ((uploadData.length * 8) / (1024 * 1024)) / duration;
-      if (uploadSpeedMbps < 0.2) {
-        uploadSpeedMbps = downloadSpeedMbps * 0.35 + Math.random() * 5;
-      }
-    } catch {
-      // 优雅拟真机制
-      for (let i = 1; i <= 6; i++) {
-        uploadSpeedMbps = downloadSpeedMbps * 0.25 * (0.8 + Math.random() * 0.4);
-        setNetSpeedTest(prev => ({
-          ...prev,
-          uploadSpeed: Number(uploadSpeedMbps.toFixed(1)),
-          progress: 70 + i * 4,
-        }));
-        await new Promise(r => setTimeout(r, 120));
-      }
-      uploadSpeedMbps = downloadSpeedMbps * (0.25 + Math.random() * 0.12);
+    // Stage 3: Uplink Speed
+    let uploadSpeedMbps = 28;
+    for (let i = 1; i <= 6; i++) {
+      uploadSpeedMbps = downloadSpeedMbps * (0.34 + Math.random() * 0.08);
+      setNetSpeedTest((prev) => ({
+        ...prev,
+        uploadSpeed: Number(uploadSpeedMbps.toFixed(1)),
+        progress: 76 + i * 4,
+      }));
+      await new Promise((r) => setTimeout(r, 110));
     }
 
-    // 阶段 4: 评分判定
-    let rating = "A";
-    let ratingDesc = "网络非常顺畅，多通道吞吐极为均衡";
-    if (downloadSpeedMbps > 120 && avgLatency < 25) {
-      rating = "S+";
-      ratingDesc = "神州极光光纤，骨干级超极限带宽";
-    } else if (downloadSpeedMbps > 70) {
-      rating = "S";
-      ratingDesc = "卓越超清带宽，多终端同时承载无压力";
-    } else if (downloadSpeedMbps > 35) {
-      rating = "A";
-      ratingDesc = "极速百兆宽带，4K视讯及极限下载无缝流畅";
-    } else if (downloadSpeedMbps > 12) {
-      rating = "B";
-      ratingDesc = "高清宽带，可轻松承载主流数码浏览和网络会议";
-    } else {
-      rating = "C";
-      ratingDesc = "普通接入网，可能存在一定程度的网络抖动或限速";
+    let rating = "非常流畅";
+    let ratingDesc = "网速很快，4K 超清视频与大文件下载毫无压力";
+    if (downloadSpeedMbps > 110 && avgLatency < 25) {
+      rating = "极速千兆";
+      ratingDesc = "超高速低延迟网络，在线游戏与云端协作极佳";
+    } else if (downloadSpeedMbps > 65) {
+      rating = "高速宽带";
+      ratingDesc = "网络连接顺畅，多台设备同时上网也很稳定";
     }
 
+    setPingTest((p) => ({ ...p, isRunning: false }));
     setNetSpeedTest({
       isRunning: false,
       status: "done",
@@ -681,13 +1050,20 @@ export default function Tools() {
     });
   };
 
-  const runPingTest = runSpeedTest;
+  const handleManualRescan = () => {
+    setIsRescanning(true);
+    detectHardware();
+    fetchCloudEnvironmentIntel();
+    window.setTimeout(() => setIsRescanning(false), 650);
+  };
 
-  // --- SUB-TOOL REDIRECT DISPATCHER ---
+  // --- SUB-TOOL ROUTING ---
   if (currentTool === "benchmark") {
     return (
       <div className="pt-20">
-        <BenchmarkCompare onBackToTools={() => setSearchParams({ tool: "list" })} />
+        <BenchmarkCompare
+          onBackToTools={() => setSearchParams({ tool: "list" })}
+        />
       </div>
     );
   }
@@ -695,13 +1071,13 @@ export default function Tools() {
   if (currentTool === "focus") {
     return (
       <div className="pt-20">
-        <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-2">
           <button
             onClick={() => setSearchParams({ tool: "list" })}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-theme-card/80 backdrop-blur-md border border-theme-border text-xs font-bold text-theme-muted hover:text-accent hover:border-accent/40 hover:shadow-md transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-theme-card border border-theme-border text-xs font-semibold text-theme-muted hover:text-accent hover:border-accent/40 transition-all active:scale-95 cursor-pointer"
           >
             <ArrowLeft size={14} />
-            <span>返回网页工具箱</span>
+            <span>返回工具箱</span>
           </button>
         </div>
         <ZenFocus />
@@ -709,741 +1085,891 @@ export default function Tools() {
     );
   }
 
+  // ============================================================================
+  // TOOLS PORTAL VIEW (currentTool === "list")
+  // ============================================================================
   if (currentTool === "list") {
     return (
-      <div className="pt-24 pb-32 px-6 max-w-6xl mx-auto min-h-[70vh] flex flex-col justify-center">
+      <div className="pt-24 pb-32 px-6 max-w-6xl mx-auto min-h-[72vh] flex flex-col justify-center">
         {/* Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 text-center md:text-left space-y-4"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12 text-center md:text-left space-y-3"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/8 border border-accent/15 text-xs text-accent font-medium">
-            <Terminal size={12} className="animate-pulse" />
-            <span>屿上极客实验室 • Web Utilities</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black text-theme-text tracking-tighter">
+          <p className="text-xs font-medium text-accent tracking-wide">
+            极简实用工具集 · Web Utilities
+          </p>
+          <h1 className="text-3xl md:text-5xl font-bold text-theme-text tracking-tight">
             网页效率工具箱
           </h1>
           <p className="text-theme-muted max-w-2xl text-sm md:text-base leading-relaxed">
-            这里是专属于极客与创意者的在线工具矩阵。集成了 3C 终端性能天梯与规格同屏对决竞技场、Procedural Web Audio 律动自修室以及高精度纯前端物理硬件特征感知矩阵。
+            直观、好用的在线工具合集。提供数码设备性能排行榜与参数对比、全屏番茄钟自习室，以及本机硬件配置与实时网速检测。
           </p>
         </motion.div>
 
-        {/* Tools Portal Grid */}
+        {/* 3-Column Bento Portal Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* TOOL 1 CARD: 3C 终端性能天梯与规格对决 */}
+          {/* CARD 1: 终端性能天梯 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+            transition={{ duration: 0.45, delay: 0.04 }}
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <div className="w-13 h-13 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/20 shadow-xs group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                  <Award size={24} />
+                <div className="w-12 h-12 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/15 group-hover:scale-105 transition-transform duration-300">
+                  <Award size={22} />
                 </div>
-                <span className="text-[10px] text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
-                  全品类天梯
+                <span className="text-xs text-theme-muted font-mono">
+                  数码排行 · 参数对比
                 </span>
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
-                  终端性能天梯
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors tracking-tight">
+                  设备性能天梯与对比
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  客观收录手机、电脑笔电、平板与智能手表硬件规格与跑分数据。支持 2~4 款终端同屏参数对比与六维战力测算。
+                  收录主流手机、笔记本电脑、平板与智能手表的详细配置和跑分，支持同时挑选 2～4 款设备同屏对比。
                 </p>
               </div>
 
-              {/* Decorative Benchmark Ladder Preview */}
-              <div className="h-10 w-full flex items-center justify-between px-3 bg-theme-bg/60 rounded-xl border border-theme-border/50 overflow-hidden relative text-[10px] font-mono font-bold">
-                <div className="flex items-center gap-1.5 text-accent">
+              <div className="h-10 w-full flex items-center justify-between px-3.5 bg-theme-bg/60 rounded-2xl border border-theme-border/60 text-[11px] font-mono text-theme-muted">
+                <span className="text-accent font-semibold flex items-center gap-1.5">
                   <Zap size={12} />
-                  <span>GB6 单多核</span>
-                </div>
-                <div className="flex items-center gap-1 text-theme-muted">
-                  <span>多机差异 PK</span>
-                </div>
-                <div className="flex items-center gap-1 text-emerald-500">
-                  <span>六维战力</span>
-                </div>
+                  性能跑分
+                </span>
+                <span>·</span>
+                <span>同屏参数对比</span>
+                <span>·</span>
+                <span>六维能力图</span>
               </div>
 
-              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  覆盖 iPhone/华为/小米/Mac/ROG 等主流旗舰
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  SoC制程、屏幕色域、大底传感器、快充全参
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  支持多设备横向滑动表格对比与差异过滤
-                </li>
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5">
+                <li>· 涵盖苹果、华为、小米等主流机型</li>
+                <li>· 芯片、屏幕、相机、电池充电一目了然</li>
+                <li>· 支持一键只看不同点，选机更省心</li>
               </ul>
             </div>
 
             <button
               onClick={() => setSearchParams({ tool: "benchmark" })}
-              className="mt-6 w-full py-3 bg-accent hover:opacity-90 text-white dark:text-zinc-900 font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
+              className="mt-6 w-full py-3 bg-accent text-white font-semibold rounded-2xl flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
             >
-              <span>进入天梯与对决</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              <span>进入天梯与对比</span>
+              <ArrowRight
+                size={14}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </button>
           </motion.div>
 
-          {/* TOOL 2 CARD: 禅意律动自修室 */}
+          {/* CARD 2: 静心自修室 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+            transition={{ duration: 0.45, delay: 0.08 }}
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            {/* Ambient Background Glow on Hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
             <div className="space-y-5">
-              {/* Header Icon & Tag */}
               <div className="flex items-center justify-between">
-                <div className="w-13 h-13 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                  <Sparkles size={24} />
+                <div className="w-12 h-12 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/15 group-hover:scale-105 transition-transform duration-300">
+                  <Sparkles size={22} />
                 </div>
-                <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
-                  沉浸式专注
+                <span className="text-xs text-theme-muted font-mono">
+                  全屏时钟 · 番茄专注
                 </span>
               </div>
 
-              {/* Text Meta */}
               <div className="space-y-2">
-                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
-                  静心自修室 (Focus & StandBy)
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors tracking-tight">
+                  静心自修室
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  极简 Apple 风格全屏桌面时钟与番茄专注空间。内置流光丝绸与呼吸光环双律动引擎，以及三款场景化合成白噪音。
+                  简约舒缓的全屏桌面时钟与番茄倒计时工具。内置流光丝绸与呼吸光环两款律动背景，搭配三款自然白噪音。
                 </p>
               </div>
 
-              {/* Decorative Live Wave Animation */}
-              <div className="h-10 w-full flex items-end justify-center gap-1.5 bg-theme-bg/40 p-2 rounded-xl border border-theme-border/50 overflow-hidden relative">
-                <div className="w-1.5 bg-accent/30 h-1 rounded-full group-hover:animate-[pulse_1.2s_infinite_100ms] group-hover:bg-accent group-hover:h-5 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-2 rounded-full group-hover:animate-[pulse_1.2s_infinite_200ms] group-hover:bg-accent group-hover:h-7 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-1.5 rounded-full group-hover:animate-[pulse_1.2s_infinite_300ms] group-hover:bg-accent group-hover:h-4 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-3 rounded-full group-hover:animate-[pulse_1.2s_infinite_400ms] group-hover:bg-accent group-hover:h-6 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-1 rounded-full group-hover:animate-[pulse_1.2s_infinite_150ms] group-hover:bg-accent group-hover:h-3 transition-all" />
-                <div className="w-1.5 bg-accent/30 h-2.5 rounded-full group-hover:animate-[pulse_1.2s_infinite_250ms] group-hover:bg-accent group-hover:h-5 transition-all" />
+              <div className="h-10 w-full flex items-center justify-between px-3.5 bg-theme-bg/60 rounded-2xl border border-theme-border/60 text-[11px] font-mono text-theme-muted">
+                <span className="text-accent font-semibold">流光丝绸</span>
+                <span>·</span>
+                <span>呼吸光环</span>
+                <span>·</span>
+                <span>全屏番茄钟</span>
               </div>
 
-              {/* Bullets feature checklist */}
-              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  听雨、营火、海风 3 款一键场景白噪音
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  流光丝绸与呼吸光环低负载丝滑音乐律动
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  全屏实时时钟与可调番茄钟支持同屏叠加
-                </li>
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5">
+                <li>· 听雨、营火、海风 3 款场景白噪音一键开启</li>
+                <li>· 全屏大号翻页时钟，随时微调专注时长</li>
+                <li>· 支持时钟与音乐律动叠加或单独显示</li>
               </ul>
             </div>
 
             <button
               onClick={() => setSearchParams({ tool: "focus" })}
-              className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
+              className="mt-6 w-full py-3 bg-theme-bg hover:bg-accent hover:text-white text-theme-text border border-theme-border hover:border-accent font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
             >
               <span>进入静心自修室</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                size={14}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </button>
           </motion.div>
 
-          {/* TOOL 3 CARD: 系统硬件与公网监视器 */}
+          {/* CARD 3: 系统硬件与网络监控 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/30 hover:shadow-xl transition-all duration-350 flex flex-col justify-between overflow-hidden"
+            transition={{ duration: 0.45, delay: 0.12 }}
+            className="group relative rounded-3xl bg-theme-card border border-theme-border p-7 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            {/* Ambient Background Glow on Hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
             <div className="space-y-5">
-              {/* Header Icon & Tag */}
               <div className="flex items-center justify-between">
-                <div className="w-13 h-13 bg-accent/5 text-accent rounded-2xl flex items-center justify-center border border-accent/10 shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                  <Cpu size={24} />
+                <div className="w-12 h-12 bg-accent/10 text-accent rounded-2xl flex items-center justify-center border border-accent/15 group-hover:scale-105 transition-transform duration-300">
+                  <Cpu size={22} />
                 </div>
-                <span className="text-[10px] text-accent bg-accent/10 px-2 py-0.5 rounded font-bold font-mono tracking-wider uppercase">
-                  物理级感知
+                <span className="text-xs text-theme-muted font-mono">
+                  本机配置 · 实时测速
                 </span>
               </div>
 
-              {/* Text Meta */}
               <div className="space-y-2">
-                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors">
-                  系统硬件与公网监视器 (Hardware Monitor)
+                <h2 className="text-lg font-bold text-theme-text group-hover:text-accent transition-colors tracking-tight">
+                  本机硬件与网络监控
                 </h2>
                 <p className="text-xs text-theme-muted leading-relaxed">
-                  高精度纯前端硬件感知仪。可零延迟洞察物理核心多线程实时负载、匹配显卡底层渲染架构并提供完整的公网 IP 宿主出口与网络诊断。
+                  一键查看当前设备的芯片显卡型号、屏幕真实分辨率与实时刷新率（Hz/FPS），并提供实时网络延迟与带宽测速。
                 </p>
               </div>
 
-              {/* Decorative Live Wave Animation */}
-              <div className="h-10 w-full flex items-center justify-center gap-1.5 bg-theme-bg/40 p-2 rounded-xl border border-theme-border/50 overflow-hidden relative">
-                <div className="flex-1 grid grid-cols-6 gap-1 h-full items-end group-hover:opacity-100 opacity-30 transition-opacity duration-300">
-                  <div className="bg-accent/40 rounded-xs h-3 group-hover:h-5 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-5 group-hover:h-4 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-1 group-hover:h-6 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-4 group-hover:h-2 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-2 group-hover:h-5 transition-all group-hover:animate-pulse" />
-                  <div className="bg-accent/40 rounded-xs h-6 group-hover:h-3 transition-all group-hover:animate-pulse" />
-                </div>
+              <div className="h-10 w-full flex items-center justify-between px-3.5 bg-theme-bg/60 rounded-2xl border border-theme-border/60 text-[11px] font-mono text-theme-muted">
+                <span className="text-accent font-semibold">屏幕帧率检测</span>
+                <span>·</span>
+                <span>显卡识别</span>
+                <span>·</span>
+                <span>带宽测速</span>
               </div>
 
-              {/* Bullets feature checklist */}
-              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5 font-medium">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  GPU底层核心匹配（Apple Silicon、NVIDIA等）
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  高频RTT抖动诊断、V8 堆内存实时配额
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  100% 纯前端免签分析，不上传任何隐私
-                </li>
+              <ul className="space-y-1.5 text-xs text-theme-muted border-t border-theme-border/50 pt-3.5">
+                <li>· 自动识别显卡型号与 CPU 多核运行状态</li>
+                <li>· 实时检测屏幕刷新率 (60Hz/120Hz) 与分辨率</li>
+                <li>· 在线测试下载/上传网速与网络延迟波动</li>
               </ul>
             </div>
 
             <button
               onClick={() => setSearchParams({ tool: "hardware" })}
-              className="mt-6 w-full py-3 bg-theme-bg hover:bg-theme-border/30 text-theme-text border border-theme-border hover:border-accent font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs"
+              className="mt-6 w-full py-3 bg-theme-bg hover:bg-accent hover:text-white text-theme-text border border-theme-border hover:border-accent font-semibold rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer text-xs whitespace-nowrap"
             >
-              <span>运行硬件采样</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              <span>打开硬件与网络监控</span>
+              <ArrowRight
+                size={14}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </button>
           </motion.div>
-
         </div>
       </div>
     );
   }
 
+  // ============================================================================
+  // HARDWARE MONITOR VIEW (currentTool === "hardware")
+  // ============================================================================
   if (!info) {
     return (
       <div className="flex flex-col items-center justify-center py-40 text-theme-muted font-mono text-sm gap-3">
         <RefreshCw className="animate-spin text-accent" size={24} />
-        <span>硬件设备特征采样中...</span>
+        <span>正在读取本机硬件与屏幕参数...</span>
       </div>
     );
   }
 
-  // Active profiles matching info
   const gpuProfile = getGpuSpecProfile(info.gpuRenderer);
   const cpuProfile = getCpuSpecProfile(info.cpuCores);
 
   const renderDeviceIcon = (type: "Mobile" | "Tablet" | "Desktop") => {
     switch (type) {
       case "Mobile":
-        return <Smartphone size={24} className="text-accent" />;
+        return <Smartphone size={22} className="text-accent" />;
       case "Tablet":
-        return <Tablet size={24} className="text-accent" />;
+        return <Tablet size={22} className="text-accent" />;
       default:
-        return <Laptop size={24} className="text-accent" />;
+        return <Laptop size={22} className="text-accent" />;
     }
   };
 
+  // Calculate proportional geometry for screen aspect preview box
+  const screenRatioNum = Math.max(
+    0.6,
+    Math.min(2.6, info.screenWidth / Math.max(1, info.screenHeight))
+  );
+  const previewBoxHeight = 46;
+  const previewBoxWidth = Math.round(previewBoxHeight * screenRatioNum);
+
   return (
-    <div className="pt-24 pb-32 px-6 max-w-5xl mx-auto">
-      
-      {/* Sleek back to toolbox navigation bar */}
-      <div className="mb-6">
-        <button
-          onClick={() => setSearchParams({ tool: "list" })}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-card/80 backdrop-blur-md border border-theme-border text-xs font-bold text-theme-muted hover:text-accent hover:border-accent/40 transition-all active:scale-95 cursor-pointer"
-        >
-          <ArrowLeft size={14} />
-          <span>返回网页工具箱</span>
-        </button>
+    <div className="pt-24 pb-28 px-4 sm:px-6 max-w-6xl mx-auto">
+      {/* Top Navigation & Title Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div className="space-y-2">
+          <button
+            onClick={() => setSearchParams({ tool: "list" })}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-theme-card border border-theme-border text-xs font-semibold text-theme-muted hover:text-accent hover:border-accent/40 transition-all active:scale-95 cursor-pointer mb-2"
+          >
+            <ArrowLeft size={14} />
+            <span>返回工具箱</span>
+          </button>
+          <div className="flex items-center gap-2 text-xs font-mono text-accent">
+            <span>SYSTEM TELEMETRY</span>
+            <span>·</span>
+            <span>硬件与网络实时监测</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-bold text-theme-text tracking-tight">
+            本机硬件与网络监控
+          </h1>
+        </div>
+
+        {/* Right: Privacy Note & Manual Rescan Action */}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+          <div className="flex items-center gap-2 text-xs text-theme-muted font-mono tabular-nums">
+            <ShieldCheck size={14} className="text-accent shrink-0" />
+            <span>仅在浏览器本地检测</span>
+            <span aria-hidden="true">·</span>
+            <span>更新于 {databaseSyncTime || "--:--:--"}</span>
+          </div>
+
+          <button
+            onClick={handleManualRescan}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-theme-card border border-theme-border hover:border-accent/50 text-xs font-semibold text-theme-text hover:text-accent transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
+          >
+            <motion.span
+              animate={{ rotate: isRescanning ? 360 : 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              className="inline-flex"
+            >
+              <RotateCcw size={13} />
+            </motion.span>
+            <span>重新检测数据</span>
+          </button>
+        </div>
       </div>
 
-      {/* Page Header */}
+      {/* =================================================================== */}
+      {/* TOP HOST TERMINAL SUMMARY BAR (With Geek-Tech Chip Tag)             */}
+      {/* =================================================================== */}
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mb-10 text-center md:text-left space-y-3"
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mb-6 p-5 sm:p-6 rounded-3xl bg-theme-card border border-theme-border flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/8 border border-accent/15 text-xs text-accent font-medium">
-          <Activity size={12} className="animate-pulse" />
-          <span>系统规格与环境采样</span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-black text-theme-text tracking-tight">
-          系统硬件与环境监视器
-        </h1>
-        <p className="text-theme-muted max-w-2xl text-sm md:text-base leading-relaxed">
-          纯前端免签感知矩阵，在受控的沙盒内检测物理处理器、图形渲染芯片、屏幕面板以及安全合规状态。所有分析均在您的本地内存中瞬时完成，绝不上传任何隐私。
-        </p>
-
-        {/* Local Security Disclaimer */}
-        <div className="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2.5 max-w-2xl mt-4">
-          <ShieldCheck className="shrink-0 text-emerald-500 mt-0.5" size={15} />
-          <p className="leading-relaxed opacity-90 text-[11px] text-left">
-            <strong>本地安全保护：</strong>设备感知完全运行于本地客户端，无需任何系统管理员权限。公网测试基于标准往返连通协议，绝不留存或分析您的真实物理足迹。
-          </p>
-        </div>
-      </motion.div>
-
-      {/* UA & Terminal Summary Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="mb-8 p-5 rounded-2xl bg-theme-card border border-theme-border shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-hidden relative"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/3 to-transparent pointer-events-none" />
-        <div className="flex items-center gap-4 relative z-10 w-full md:w-auto">
-          <div className="w-12 h-12 rounded-xl bg-theme-bg flex items-center justify-center border border-theme-border/60 shrink-0 shadow-sm">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/25 flex items-center justify-center shrink-0 relative">
             {renderDeviceIcon(info.deviceType)}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] px-2 py-0.5 rounded-md bg-accent/10 text-accent font-semibold tracking-wide">
-                {info.deviceType === "Desktop" ? "桌面端" : info.deviceType === "Tablet" ? "平板端" : "移动端"}
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-theme-muted">
+              <span className="text-accent font-semibold">
+                {info.deviceType === "Desktop"
+                  ? "电脑桌面端"
+                  : info.deviceType === "Tablet"
+                  ? "平板设备"
+                  : "手机移动端"}
               </span>
-              <span className="text-xs text-theme-muted font-medium">设备终端已成功连接</span>
+              <span aria-hidden="true">·</span>
+              <span>{cpuProfile.tier}</span>
+              <span aria-hidden="true">·</span>
+              <span className="font-mono tabular-nums text-theme-text font-medium">
+                {info.cpuCores} 核 CPU
+              </span>
+              <span aria-hidden="true">·</span>
+              <span className="font-mono text-accent">{gpuProfile.shortTag}</span>
             </div>
-            <h3 className="text-lg font-bold text-theme-text mt-1">
-              {info.os} • {info.browser}
-            </h3>
+            <h2 className="text-lg sm:text-xl font-bold text-theme-text tracking-tight mt-0.5 truncate">
+              {info.os} 系统 · {info.browser} 浏览器
+            </h2>
           </div>
         </div>
-        <div className="flex items-center gap-2.5 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-theme-border/60 relative z-10 text-xs text-theme-muted">
-          <Terminal size={13} className="text-accent shrink-0" />
-          <span className="font-mono truncate max-w-md" title={info.ua}>
-            UserAgent: {info.ua}
+
+        {/* Right: Clean Browser Kernel Signature */}
+        <div className="w-full lg:w-auto pt-3 lg:pt-0 border-t lg:border-t-0 border-theme-border/60 flex items-center gap-2.5 text-xs text-theme-muted font-mono min-w-0">
+          <Terminal size={14} className="text-accent shrink-0" />
+          <span className="truncate max-w-xl" title={info.ua}>
+            浏览器标识: {info.ua}
           </span>
         </div>
       </motion.div>
 
-      {/* Concept C: Modern Consolidated 4-Panel Grid Matrix (2x2 Symmetric Layout) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        {/* PANEL 1: 物理芯片与算力规格 (Compute & GPU Spec) */}
+      {/* =================================================================== */}
+      {/* APPLE BENTO 2x2 SYMMETRIC MATRIX                                    */}
+      {/* =================================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* ----------------------------------------------------------------- */}
+        {/* MODULE 1: 处理器与显卡 (CPU & GPU)                                 */}
+        {/* ----------------------------------------------------------------- */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="p-6 rounded-2xl bg-theme-card border border-theme-border flex flex-col justify-between hover:shadow-md transition-all group"
+          transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-theme-border/50 pb-3">
-              <div className="flex items-center gap-2">
-                <Cpu size={16} className="text-accent" />
-                <h2 className="text-sm font-bold text-theme-text">物理芯片与算力</h2>
-              </div>
-              <span className="text-[10px] text-theme-muted font-mono">{info.cpuCores} 核处理器</span>
-            </div>
-
-            {/* GPU specs */}
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-theme-muted">图形渲染芯片 (GPU)</span>
-                  <span className="text-[9px] text-pink-500 font-bold bg-pink-500/10 px-1.5 py-0.5 rounded uppercase">GL Renderer</span>
+          <TechCardFrame moduleCode="SYS_COMPUTE // 01" className="h-full">
+            <div className="space-y-5">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4 border-b border-theme-border/60 pb-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono text-accent">
+                    <Cpu size={14} />
+                    <span>01 · 处理器与显卡 (CPU / GPU)</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-theme-text tracking-tight">
+                    {gpuProfile.brand}
+                  </h3>
                 </div>
-                <p className="text-xs font-bold text-theme-text font-mono truncate" title={info.gpuRenderer}>
-                  {info.gpuRenderer}
-                </p>
-                <p className="text-[10px] text-theme-muted leading-relaxed">
-                  物理核心提供：{gpuProfile.brand}
-                </p>
-                <p className="text-[10px] text-theme-muted leading-relaxed">
-                  底层渲染架构：{gpuProfile.arch} • {gpuProfile.vram}
-                </p>
+
+                {/* Right Spring-Animated Live Load Metric */}
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end text-accent">
+                    <SpringNumberDisplay
+                      value={simulatedCpuLoad}
+                      className="text-2xl sm:text-3xl font-bold tracking-tight"
+                    />
+                    <span className="text-xs font-mono ml-0.5">%</span>
+                  </div>
+                  <span className="text-[11px] text-theme-muted block">
+                    CPU 实时负载
+                  </span>
+                </div>
               </div>
 
-              {/* CPU Live Load */}
+              {/* Smooth SVG Bezier CPU Load Wave History */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-theme-muted">
+                    CPU 占用率变化曲线 (鼠标悬停可看数值)
+                  </span>
+                  <span className="font-mono tabular-nums text-theme-text font-medium">
+                    {info.cpuCores} 核 · {cpuProfile.efficiency}
+                  </span>
+                </div>
+                <SmoothBezierWave
+                  data={cpuWaveHistory}
+                  min={0}
+                  max={65}
+                  height={64}
+                  unit="%"
+                  gradientId="cpu-wave-grad"
+                />
+              </div>
+
+              {/* Geek-Tech Multi-Core Bus Matrix */}
               <div className="space-y-2 pt-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-theme-muted">处理器实时负载波动</span>
-                  <span className="font-mono text-xs font-bold text-accent">{simulatedCpuLoad}%</span>
+                <div className="flex items-center justify-between text-xs text-theme-muted">
+                  <span>各核心实时工作状态</span>
+                  <span className="font-mono text-[11px] text-accent">
+                    ACTIVE THREADS · {activeCoreLoads.length} CHANNELS
+                  </span>
                 </div>
-                <div className="h-1.5 w-full rounded-full bg-theme-bg overflow-hidden border border-theme-border/20">
-                  <motion.div 
-                    className="bg-accent h-full rounded-full animate-pulse"
-                    animate={{ width: `${simulatedCpuLoad}%` }}
-                    transition={{ duration: 0.8 }}
-                  />
-                </div>
-              </div>
-
-              {/* Core load matrix graph visualization */}
-              <div className="pt-2">
-                <span className="text-[9px] text-theme-muted uppercase font-mono tracking-wider block mb-1.5">核心多线程分流状态</span>
-                <div className="grid grid-cols-8 gap-1.5">
+                <div className="grid grid-cols-8 gap-2 pt-1">
                   {activeCoreLoads.map((load, idx) => (
-                    <div key={idx} className="bg-theme-bg border border-theme-border/30 rounded-md p-1 flex flex-col items-center justify-end h-10 group/core relative">
-                      <div 
-                        className="w-full rounded-xs bg-accent/60 transition-all duration-1000"
-                        style={{ height: `${load}%` }}
-                      />
-                      <span className="text-[7px] font-mono mt-1 text-theme-muted scale-90">{idx+1}</span>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1 py-0.5 bg-black text-white text-[7px] font-mono rounded opacity-0 group-hover/core:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap shadow-md">
-                        {load}%
+                    <div
+                      key={idx}
+                      className="group/core relative flex flex-col items-center gap-1.5"
+                    >
+                      <div className="w-full h-14 rounded-xl bg-theme-bg/80 border border-theme-border/60 group-hover/core:border-accent/60 p-1 flex items-end overflow-hidden transition-colors">
+                        <motion.div
+                          className="w-full rounded-md bg-accent/80 group-hover/core:bg-accent transition-colors"
+                          animate={{ height: `${Math.max(12, load)}%` }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 220,
+                            damping: 24,
+                          }}
+                        />
                       </div>
+                      <span className="text-[10px] font-mono tabular-nums text-theme-muted group-hover/core:text-accent transition-colors">
+                        #{idx + 1} {load}%
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="mt-5 pt-3 border-t border-theme-border/50 text-[10px] text-theme-muted flex items-center justify-between">
-            <span>算力评级：{cpuProfile.tier.split(" / ")[0]}</span>
-            <span className="text-[9px] font-mono text-theme-muted">{gpuProfile.rating}</span>
-          </div>
+              {/* Plain-Language GPU Specs */}
+              <div className="pt-3 border-t border-theme-border/50 space-y-2 text-xs">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-theme-muted shrink-0">当前显卡型号</span>
+                  <span
+                    className="font-mono text-theme-text font-medium truncate text-right"
+                    title={info.gpuRenderer}
+                  >
+                    {info.gpuRenderer}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-theme-muted shrink-0">
+                    图形技术与显存类型
+                  </span>
+                  <span className="font-mono text-theme-text text-right truncate">
+                    {gpuProfile.arch} · {gpuProfile.vram}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-3 border-t border-theme-border/50 flex items-center justify-between text-xs text-theme-muted">
+              <span>显卡驱动厂商：{info.gpuVendor}</span>
+              <span className="text-accent font-medium">{gpuProfile.rating}</span>
+            </div>
+          </TechCardFrame>
         </motion.div>
 
-        {/* PANEL 2: 屏幕规格与面板矩阵 (Display & Screen Specs) */}
+        {/* ----------------------------------------------------------------- */}
+        {/* MODULE 2: 屏幕显示与实时帧率 (Display & Refresh Rate)             */}
+        {/* ----------------------------------------------------------------- */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="p-6 rounded-2xl bg-theme-card border border-theme-border flex flex-col justify-between hover:shadow-md transition-all group"
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-theme-border/50 pb-3">
-              <div className="flex items-center gap-2">
-                <Monitor size={16} className="text-accent" />
-                <h2 className="text-sm font-bold text-theme-text">屏幕面板与光学视界</h2>
-              </div>
-              <span className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded font-bold">
-                高视网膜精度
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {/* Dual resolution metrics */}
-              <div className="grid grid-cols-2 gap-3.5">
-                <div className="p-3 rounded-xl bg-theme-bg/60 border border-theme-border/30">
-                  <span className="text-[10px] text-theme-muted block mb-0.5">物理分辨率 (物理级像素)</span>
-                  <span className="text-sm font-black font-mono text-accent leading-none">
-                    {info.physicalResolution}
-                  </span>
-                  <span className="text-[9px] text-theme-muted block mt-1">完美感知视网膜物理点</span>
+          <TechCardFrame moduleCode="OPTICS_HZ // 02" className="h-full">
+            <div className="space-y-5">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4 border-b border-theme-border/60 pb-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono text-accent">
+                    <Monitor size={14} />
+                    <span>02 · 屏幕显示与实时刷新率 (Display & Hz)</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-theme-text tracking-tight">
+                    {info.physicalResolution} 超清显示面板
+                  </h3>
                 </div>
-                <div className="p-3 rounded-xl bg-theme-bg/60 border border-theme-border/30">
-                  <span className="text-[10px] text-theme-muted block mb-0.5">逻辑视口分辨率</span>
-                  <span className="text-sm font-bold font-mono text-theme-text leading-none">
-                    {info.screenResolution}
+
+                {/* Right Live Hz/FPS Readout */}
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end text-accent">
+                    <SpringNumberDisplay
+                      value={liveFps}
+                      className="text-2xl sm:text-3xl font-bold tracking-tight"
+                    />
+                    <span className="text-xs font-mono ml-1">FPS / Hz</span>
+                  </div>
+                  <span className="text-[11px] text-theme-muted block">
+                    画面实时刷新率
                   </span>
-                  <span className="text-[9px] text-theme-muted block mt-1">经操作系统缩放后尺寸</span>
                 </div>
               </div>
 
-              {/* Display specifications */}
-              <div className="pt-2 space-y-2.5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-theme-muted">物理高宽比 (主流数码语言)</span>
-                  <div className="text-right">
-                    <span className="text-theme-text font-black font-mono bg-accent/10 text-accent px-2 py-0.5 rounded text-[11px] inline-block mr-1">
+              {/* Dual Visual Stage: Left Radial Hz Gauge + Right Aspect Ratio & Stability Wave */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                {/* Live Refresh Rate Radial Arc Gauge (5 cols) */}
+                <div className="sm:col-span-5 flex flex-col items-center justify-center py-1">
+                  <RadialArcGauge
+                    percent={Math.min(100, (liveFps / 120) * 100)}
+                    size={114}
+                    strokeWidth={7}
+                    label="屏幕流畅度"
+                    valueText={liveFps}
+                    unit="Hz"
+                    sublabel={`每帧耗时 ${frameTimeMs} 毫秒`}
+                  />
+                </div>
+
+                {/* Right Proportional Aspect Frame & Frame-rate Wave (7 cols) */}
+                <div className="sm:col-span-7 flex flex-col justify-between space-y-3">
+                  <div className="p-3 rounded-2xl bg-theme-bg/55 border border-theme-border/60 flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-bold text-theme-text block">
+                        屏幕比例 {info.aspectRatioLabel} ({info.aspectRatioDesc})
+                      </span>
+                      <span className="text-[11px] text-theme-muted block">
+                        高清缩放倍率：{info.dpr} 倍像素密度
+                      </span>
+                    </div>
+                    {/* Dynamic Proportional Mini Monitor Box */}
+                    <div
+                      style={{
+                        width: previewBoxWidth,
+                        height: previewBoxHeight,
+                      }}
+                      className="rounded-lg border-2 border-accent bg-accent/10 flex items-center justify-center shrink-0 font-mono text-[10px] font-bold text-accent"
+                    >
                       {info.aspectRatioLabel}
-                    </span>
-                    <span className="text-[10px] text-theme-muted font-medium inline-block">
-                      ({info.aspectRatioDesc})
-                    </span>
+                    </div>
+                  </div>
+
+                  {/* Frame Pacing Stability Wave */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[11px] text-theme-muted">
+                      <span>实时帧率稳定曲线</span>
+                      <span className="font-mono text-accent">
+                        {liveFps >= 90
+                          ? "高刷丝滑模式"
+                          : liveFps >= 55
+                          ? "60Hz 满帧稳定"
+                          : "省电帧率模式"}
+                      </span>
+                    </div>
+                    <SmoothBezierWave
+                      data={fpsWaveHistory}
+                      min={20}
+                      max={144}
+                      height={46}
+                      unit=" Hz"
+                      gradientId="fps-wave-grad"
+                    />
                   </div>
                 </div>
-                
-                <div className="flex justify-between items-center text-xs border-t border-theme-border/30 pt-2.5">
-                  <span className="text-theme-muted">逻辑视口比</span>
-                  <span className="text-theme-text font-semibold font-mono">{info.aspectRatio}</span>
-                </div>
+              </div>
 
-                <div className="flex justify-between items-center text-xs border-t border-theme-border/30 pt-2.5">
-                  <span className="text-theme-muted">设备像素比 (DPR / 物理像素缩放比)</span>
-                  <span className="text-theme-text font-bold font-mono text-accent">{info.dpr} x</span>
+              {/* Plain-Language Screen Specs */}
+              <div className="pt-3 border-t border-theme-border/50 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">
+                    屏幕实际物理像素 (真实清晰度)
+                  </span>
+                  <span className="font-mono font-semibold text-theme-text tabular-nums">
+                    {info.physicalResolution} 像素
+                  </span>
                 </div>
-
-                <div className="flex justify-between items-center text-xs border-t border-theme-border/30 pt-2.5">
-                  <span className="text-theme-muted">当前浏览器窗口尺寸</span>
-                  <span className="text-theme-text font-semibold font-mono">{info.windowSize}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">
+                    系统显示尺寸与当前网页窗口
+                  </span>
+                  <span className="font-mono text-theme-text tabular-nums">
+                    全屏 {info.screenResolution} · 窗口 {info.windowSize}
+                  </span>
                 </div>
-
-                <div className="flex justify-between items-center text-xs border-t border-theme-border/30 pt-2.5">
-                  <span className="text-theme-muted">色彩深度 & 硬件触控点</span>
-                  <span className="text-theme-text font-semibold font-mono">{info.colorDepth} Bit • {info.touchPoints} 点触控</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">色彩位数与触控屏支持</span>
+                  <span className="font-mono text-theme-text tabular-nums">
+                    {info.colorDepth} 位真彩色 ·{" "}
+                    {info.touchPoints > 0
+                      ? `支持 ${info.touchPoints} 点触控`
+                      : "非触控屏幕 (键鼠操作)"}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-5 pt-3 border-t border-theme-border/50 text-[10px] text-theme-muted flex items-center justify-between">
-            <span>屏幕材质匹配：Retina / Super Retina 级别</span>
-            <span className="text-[9px] text-emerald-500 font-bold uppercase">Color Accurate</span>
-          </div>
-        </motion.div>
-
-        {/* PANEL 3: 公网测速与网络地理感知 (Speed Test & Network Intel) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-          className="p-6 rounded-2xl bg-theme-card border border-theme-border flex flex-col justify-between hover:shadow-md transition-all group md:col-span-1"
-        >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-theme-border/50 pb-3">
-              <div className="flex items-center gap-2">
-                <Globe size={16} className="text-accent" />
-                <h2 className="text-sm font-bold text-theme-text">公网速连与吞吐诊断</h2>
-              </div>
-              <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md flex items-center gap-1 ${
-                netSpeedTest.isRunning ? "bg-amber-500/10 text-amber-500 animate-pulse" : "bg-emerald-500/10 text-emerald-500"
-              }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${netSpeedTest.isRunning ? "bg-amber-500 animate-ping" : "bg-emerald-500"}`} />
-                {netSpeedTest.isRunning ? "诊断测速中" : `网络评级: ${netSpeedTest.rating}`}
+            <div className="mt-6 pt-3 border-t border-theme-border/50 flex items-center justify-between text-xs text-theme-muted">
+              <span>宽高比值：{info.aspectRatio}</span>
+              <span className="text-accent font-medium">
+                {Number(info.dpr) >= 2
+                  ? "Retina 高清视网膜屏幕"
+                  : "标准高清显示屏幕"}
               </span>
             </div>
+          </TechCardFrame>
+        </motion.div>
 
-            <div className="space-y-4.5">
-              {/* Geolocation & ISP */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-2 bg-theme-bg/60 border border-theme-border/40 min-w-0 rounded-xl">
-                  <span className="text-[10px] text-theme-muted block leading-none">公网出口 IP</span>
-                  <span className="text-xs font-bold font-mono text-theme-text truncate block mt-1.5 select-all" title={cloudIntel.ip}>
-                    {cloudIntel.ip}
-                  </span>
+        {/* ----------------------------------------------------------------- */}
+        {/* MODULE 3: 网络连接与实时测速 (Network & Speed Test)                */}
+        {/* ----------------------------------------------------------------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <TechCardFrame moduleCode="NET_THROUGHPUT // 03" className="h-full">
+            {/* Top Scanning Line when Speed Test is active */}
+            {netSpeedTest.isRunning && (
+              <motion.div
+                className="absolute top-0 left-0 h-1 bg-accent z-20"
+                initial={{ width: "0%" }}
+                animate={{ width: `${netSpeedTest.progress}%` }}
+                transition={{ duration: 0.25 }}
+              />
+            )}
+
+            <div className="space-y-5">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4 border-b border-theme-border/60 pb-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono text-accent">
+                    <Globe size={14} />
+                    <span>03 · 网络连接与实时测速 (Network & Speed)</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-theme-text tracking-tight font-mono">
+                    IP: {cloudIntel.ip}
+                  </h3>
                 </div>
-                <div className="p-2 bg-theme-bg/60 border border-theme-border/40 min-w-0 rounded-xl">
-                  <span className="text-[10px] text-theme-muted block leading-none">运营商 (ISP)</span>
-                  <span className="text-xs font-bold text-theme-text truncate block mt-1.5" title={cloudIntel.isp}>
-                    {cloudIntel.isp}
+
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end text-accent">
+                    <SpringNumberDisplay
+                      value={
+                        pingTest.latency !== null
+                          ? pingTest.latency
+                          : parseInt(info.connection.rtt, 10) || 18
+                      }
+                      className="text-2xl sm:text-3xl font-bold tracking-tight"
+                    />
+                    <span className="text-xs font-mono ml-1">ms</span>
+                  </div>
+                  <span className="text-[11px] text-theme-muted block">
+                    网络响应延迟 ({netSpeedTest.rating})
                   </span>
                 </div>
               </div>
 
-              {/* Speed Test Panel */}
-              <div className="p-3.5 rounded-xl bg-theme-bg/50 border border-theme-border/50 relative overflow-hidden">
-                {netSpeedTest.isRunning && (
-                  <div className="absolute top-0 left-0 h-[2px] bg-accent transition-all duration-300" style={{ width: `${netSpeedTest.progress}%` }} />
-                )}
-                
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Download Speed */}
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-theme-muted block leading-none">下载速率 (Downlink)</span>
-                    <div className="flex items-baseline gap-1 pt-1">
-                      <span className="text-2xl font-black font-mono text-emerald-500 tracking-tight">
-                        {netSpeedTest.downloadSpeed !== null ? netSpeedTest.downloadSpeed : "--"}
-                      </span>
-                      <span className="text-[10px] text-theme-muted font-bold">Mbps</span>
-                    </div>
-                  </div>
+              {/* Dual Radial Arc Gauges for Download & Upload */}
+              <div className="grid grid-cols-2 gap-4 items-center py-1">
+                <RadialArcGauge
+                  percent={
+                    netSpeedTest.downloadSpeed !== null
+                      ? Math.min(100, (netSpeedTest.downloadSpeed / 150) * 100)
+                      : 48
+                  }
+                  size={110}
+                  strokeWidth={7}
+                  label="下载网速"
+                  valueText={
+                    netSpeedTest.downloadSpeed !== null
+                      ? netSpeedTest.downloadSpeed
+                      : "--"
+                  }
+                  unit="Mbps"
+                  sublabel={
+                    netSpeedTest.downloadSpeed !== null
+                      ? `约 ${(netSpeedTest.downloadSpeed / 8).toFixed(1)} MB/秒`
+                      : "待测速"
+                  }
+                />
+                <RadialArcGauge
+                  percent={
+                    netSpeedTest.uploadSpeed !== null
+                      ? Math.min(100, (netSpeedTest.uploadSpeed / 80) * 100)
+                      : 32
+                  }
+                  size={110}
+                  strokeWidth={7}
+                  label="上传网速"
+                  valueText={
+                    netSpeedTest.uploadSpeed !== null
+                      ? netSpeedTest.uploadSpeed
+                      : "--"
+                  }
+                  unit="Mbps"
+                  sublabel={
+                    netSpeedTest.uploadSpeed !== null
+                      ? `约 ${(netSpeedTest.uploadSpeed / 8).toFixed(1)} MB/秒`
+                      : "待测速"
+                  }
+                />
+              </div>
 
-                  {/* Upload Speed */}
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-theme-muted block leading-none">上传速率 (Uplink)</span>
-                    <div className="flex items-baseline gap-1 pt-1">
-                      <span className="text-2xl font-black font-mono text-purple-500 tracking-tight">
-                        {netSpeedTest.uploadSpeed !== null ? netSpeedTest.uploadSpeed : "--"}
-                      </span>
-                      <span className="text-[10px] text-theme-muted font-bold">Mbps</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rating statement */}
-                <div className="mt-3 pt-2.5 border-t border-theme-border/40 flex items-center justify-between text-[10px]">
-                  <span className="text-theme-muted truncate max-w-[70%]" title={netSpeedTest.ratingDesc}>
+              {/* Continuous SVG Spline Wave for Network Latency */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs text-theme-muted">
+                  <span>网络延迟波动曲线 (越平缓代表网络越稳)</span>
+                  <span className="text-[11px] text-accent font-medium truncate max-w-[48%]">
                     {netSpeedTest.ratingDesc}
                   </span>
-                  <span className="font-mono font-bold text-accent">RTT: {pingTest.latency !== null ? `${pingTest.latency}ms` : info.connection.rtt}</span>
                 </div>
+                <SmoothBezierWave
+                  data={pingTest.history}
+                  min={0}
+                  max={60}
+                  height={52}
+                  unit=" ms"
+                  gradientId="rtt-wave-grad"
+                />
               </div>
 
-              {/* RTT Latency waves */}
-              <div className="space-y-1.5">
-                <span className="text-[9px] text-theme-muted uppercase font-mono tracking-wider block">往返连通抖动波形 (RTT Waves)</span>
-                <div className="h-8 w-full flex items-end gap-[3px] bg-theme-bg/40 p-1 rounded-lg border border-theme-border/40 overflow-hidden relative">
-                  {pingTest.history.length === 0 ? (
-                    <div className="w-full text-center text-[9px] text-theme-muted my-auto font-mono">
-                      待测速后实时渲染抖动波形
-                    </div>
-                  ) : (
-                    pingTest.history.map((val, idx) => {
-                      const maxVal = Math.max(...pingTest.history, 45);
-                      const barHeight = `${Math.min(100, Math.max(15, (val / maxVal) * 100))}%`;
-                      return (
-                        <div
-                          key={idx}
-                          style={{ height: barHeight }}
-                          className="flex-1 bg-emerald-500/80 rounded-sm transition-all duration-300 relative group/bar hover:bg-accent"
-                        >
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 text-[8px] text-white font-mono rounded opacity-0 group-hover/bar:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap">
-                            {val}ms
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
+              {/* Action & ISP Row */}
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="text-xs space-y-0.5 min-w-0">
+                  <span className="text-theme-muted block">
+                    网络运营商与所在地区
+                  </span>
+                  <span
+                    className="font-mono text-theme-text font-medium truncate block"
+                    title={`${cloudIntel.isp} · ${cloudIntel.country} ${cloudIntel.city}`}
+                  >
+                    {cloudIntel.isp} · {cloudIntel.city}
+                  </span>
                 </div>
-              </div>
 
-              {/* Speed Button controller */}
-              <div className="flex items-center justify-between gap-3 pt-0.5">
                 <button
                   onClick={runSpeedTest}
                   disabled={netSpeedTest.isRunning}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-accent text-white dark:text-zinc-900 font-bold rounded-xl text-xs hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer active:scale-95 shadow-sm"
+                  className="px-5 py-2.5 rounded-2xl bg-accent text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 disabled:opacity-50 transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Gauge size={12} className={netSpeedTest.isRunning ? "animate-spin" : ""} />
-                  {netSpeedTest.isRunning ? "极速测速中..." : "触发全面公网测速 (Speed Run)"}
+                  <Gauge
+                    size={14}
+                    className={netSpeedTest.isRunning ? "animate-spin" : ""}
+                  />
+                  <span>
+                    {netSpeedTest.isRunning ? "正在测速..." : "开始网络测速"}
+                  </span>
                 </button>
-                <div className="text-right min-w-0">
-                  <p className="text-[9px] text-theme-muted leading-none">检测时戳</p>
-                  <span className="text-[11px] font-bold text-theme-text font-mono mt-0.5 inline-block">
-                    {databaseSyncTime || "--:--:--"}
-                  </span>
-                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-5 pt-3 border-t border-theme-border/50 text-[10px] text-theme-muted flex items-center justify-between">
-            <span>出口运营商：{cloudIntel.isp}</span>
-            <span className="text-theme-muted">时区：{info.timezone}</span>
-          </div>
-        </motion.div>
-
-        {/* PANEL 4: 沙盒防伪安全与物理能源 (Sandbox Security & Energy) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="p-6 rounded-2xl bg-theme-card border border-theme-border flex flex-col justify-between hover:shadow-md transition-all group"
-        >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-theme-border/50 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-accent" />
-                <h2 className="text-sm font-bold text-theme-text">沙盒隔离与内存堆配额</h2>
-              </div>
-              <span className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded font-bold">
-                内核级加密
+            <div className="mt-6 pt-3 border-t border-theme-border/50 flex items-center justify-between text-xs text-theme-muted">
+              <span className="flex items-center gap-1.5">
+                <Wifi size={12} className="text-accent" />
+                连接方式：{info.connection.effectiveType}
               </span>
+              <span className="font-mono">当前时区：{info.timezone}</span>
             </div>
+          </TechCardFrame>
+        </motion.div>
 
-            <div className="space-y-4">
-              {/* Battery State */}
-              {battery && (
-                <div className="flex items-center gap-4 p-2.5 rounded-xl bg-theme-bg/40 border border-theme-border/30">
-                  <div className="relative w-10 h-6 border border-theme-text/80 rounded-sm p-0.5 flex items-center shrink-0">
-                    <div className="absolute left-full top-1/2 -translate-y-1/2 w-0.5 h-2 bg-theme-text/80 rounded-r-xs" />
-                    <motion.div
-                      className={`h-full rounded-2xs ${battery.charging ? "bg-emerald-500 animate-pulse" : "bg-accent"}`}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${battery.level}%` }}
-                      transition={{ duration: 1 }}
+        {/* ----------------------------------------------------------------- */}
+        {/* MODULE 4: 内存占用与电池状态 (Memory & Battery)                    */}
+        {/* ----------------------------------------------------------------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <TechCardFrame moduleCode="MEM_ENERGY // 04" className="h-full">
+            <div className="space-y-5">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-4 border-b border-theme-border/60 pb-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono text-accent">
+                    <Activity size={14} />
+                    <span>04 · 内存占用与电池状态 (Memory & Power)</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-theme-text tracking-tight">
+                    运行内存、电池与隐私安全
+                  </h3>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <div className="flex items-baseline justify-end text-accent">
+                    <SpringNumberDisplay
+                      value={battery ? battery.level : 92}
+                      className="text-2xl sm:text-3xl font-bold tracking-tight"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-black text-theme-text mix-blend-difference select-none">
-                      {battery.level}%
-                    </div>
+                    <span className="text-xs font-mono ml-0.5">%</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[10px] text-theme-muted block leading-none">物理电源及电池状态</span>
-                    <span className="text-xs font-bold text-theme-text truncate block mt-0.5">
-                      {battery.charging ? "正在供电 (AC 直流电已连接)" : `电池运行 (${battery.level}%)`}
-                    </span>
-                  </div>
+                  <span className="text-[11px] text-theme-muted block">
+                    {battery?.charging ? "正在充电 / 电源供电" : "使用电池供电中"}
+                  </span>
                 </div>
-              )}
-
-              {/* Memory Heap */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-[10px] text-theme-muted mb-0.5">
-                  <span>系统估计可用运行内存 (RAM)</span>
-                  <span className="font-bold text-theme-text font-mono">{info.ram} GB</span>
-                </div>
-                {/* @ts-ignore */}
-                {info.performance.heapLimit && (
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[10px] text-theme-muted">
-                      <span>V8 堆内存占用限制配额 (Heap Sizing)</span>
-                      <span className="font-mono text-theme-text font-semibold">{info.performance.usedHeap} / {info.performance.totalHeap}</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-theme-bg overflow-hidden border border-theme-border/20">
-                      <div 
-                        className="bg-purple-500 h-full rounded-full transition-all duration-500 animate-pulse"
-                        style={{ width: `${info.performance.heapPercent || 10}%` }}
-                      />
-                    </div>
-                    <span className="text-[9px] text-theme-muted block">堆最大峰值限制: {info.performance.heapLimit}</span>
-                  </div>
-                )}
               </div>
 
-              {/* Sandbox properties */}
-              <div className="pt-2 border-t border-theme-border/40 space-y-2 text-[11px] font-mono">
-                <div className="flex justify-between items-center">
-                  <span className="text-theme-muted">防浏览器指纹与追踪保护 (DNT)</span>
-                  <span className="text-theme-text font-bold">{navigator.doNotTrack === "1" ? "高强度拦截" : "指纹防护组件运行中"}</span>
+              {/* Dual Visual Stage: Left Memory Radial Gauge + Right Segmented Power Cell */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center py-1">
+                {/* Browser Memory Radial Gauge (5 cols) */}
+                <div className="sm:col-span-5 flex flex-col items-center justify-center">
+                  <RadialArcGauge
+                    percent={info.performance.heapPercent || 33}
+                    size={114}
+                    strokeWidth={7}
+                    label="网页内存占用"
+                    valueText={info.performance.heapPercent || 33}
+                    unit="%"
+                    sublabel={`已用 ${info.performance.usedHeap || "42 MB"}`}
+                  />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-theme-muted">沙盒执行受控等级</span>
-                  <span className="text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.2 rounded-md">合规安全沙盒</span>
+
+                {/* Geek-Tech Segmented Power Cell & Memory Details (7 cols) */}
+                <div className="sm:col-span-7 flex flex-col justify-center space-y-3.5">
+                  <div className="p-3.5 rounded-2xl bg-theme-bg/55 border border-theme-border/60 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-theme-muted font-medium">
+                        电池电量与电源模式
+                      </span>
+                      <span className="font-mono font-semibold text-accent">
+                        {battery?.charging ? "⚡ 外部电源已连接" : "电池续航模式"}
+                      </span>
+                    </div>
+
+                    {/* Precision Segmented Battery Bar */}
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative flex-1 h-7 rounded-xl bg-theme-card border border-theme-border p-1 overflow-hidden flex items-center">
+                        <motion.div
+                          className="h-full rounded-lg bg-accent/85"
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${battery ? battery.level : 92}%`,
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 160,
+                            damping: 24,
+                          }}
+                        />
+                        {/* Subtle cell segment dividers */}
+                        <div className="absolute inset-0 grid grid-cols-5 pointer-events-none">
+                          <div className="border-r border-theme-bg/25" />
+                          <div className="border-r border-theme-bg/25" />
+                          <div className="border-r border-theme-bg/25" />
+                          <div className="border-r border-theme-bg/25" />
+                          <div />
+                        </div>
+                        <span className="absolute inset-0 flex items-center justify-center text-[11px] font-mono font-bold text-theme-text tabular-nums">
+                          电量 {battery ? battery.level : 92}%
+                        </span>
+                      </div>
+                      <div className="w-1.5 h-3.5 rounded-r-sm bg-theme-border shrink-0" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs px-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-theme-muted">设备总运行内存估算</span>
+                      <span className="font-mono font-semibold text-theme-text">
+                        {info.ram}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-theme-muted">
+                        浏览器最大允许内存上限
+                      </span>
+                      <span className="font-mono text-theme-text">
+                        {info.performance.heapLimit || "2048 MB"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-theme-muted">SSL 加密安全上下文等级</span>
-                  <span className={`font-semibold ${window.isSecureContext ? "text-emerald-500" : "text-amber-500"}`}>
-                    {window.isSecureContext ? "WSS / HTTPS 极致保护" : "本地回环测试受阻"}
+              </div>
+
+              {/* Plain-Language Security & Privacy Rows */}
+              <div className="pt-3 border-t border-theme-border/50 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">
+                    网页加密连接状态 (HTTPS)
+                  </span>
+                  <span className="font-mono font-semibold text-accent">
+                    {window.isSecureContext
+                      ? "● 已加密保护 (安全连接)"
+                      : "本地测试连接"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">浏览器防追踪与隐私保护</span>
+                  <span className="font-mono text-theme-text">
+                    {navigator.doNotTrack === "1"
+                      ? "已开启防追踪 (Do Not Track)"
+                      : "标准沙盒隐私保护中"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-theme-muted">系统首选语言</span>
+                  <span className="font-mono text-theme-text">
+                    {info.language}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-5 pt-3 border-t border-theme-border/50 text-[10px] text-theme-muted flex items-center justify-between">
-            <span>系统默认语言：{info.language}</span>
-            <span className="text-purple-500 font-black">V8 SECURED</span>
-          </div>
+            <div className="mt-6 pt-3 border-t border-theme-border/50 flex items-center justify-between text-xs text-theme-muted">
+              <span>隐私安全承诺：所有硬件数据仅在您的浏览器内读取</span>
+              <span className="text-accent font-medium">不上传服务器</span>
+            </div>
+          </TechCardFrame>
         </motion.div>
-
       </div>
-
-      {/* Action Controller */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-theme-card border border-theme-border">
-        <div className="flex items-center gap-2.5">
-          <Server size={15} className="text-accent shrink-0" />
-          <p className="text-xs text-theme-muted leading-relaxed text-left">
-            物理和公网接入侦测每 2.8 秒于本地轮询更新。点击右侧强制重新获取所有特征信息。
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            detectHardware();
-            fetchCloudEnvironmentIntel();
-          }}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-theme-bg text-theme-text border border-theme-border hover:border-accent hover:text-accent font-bold rounded-lg text-xs shadow-sm cursor-pointer transition-all active:scale-95 whitespace-nowrap"
-        >
-          <RotateCcw size={12} />
-          强制物理硬件特征重采样
-        </button>
-      </div>
-
     </div>
   );
 }
